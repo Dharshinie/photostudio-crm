@@ -1,14 +1,7 @@
 import { Mail, Phone, Plus, Search } from "lucide-react";
 import { Button } from "@/components/ui/button";
-
-const clients = [
-  { name: "Mara Jensen", email: "mara@email.com", phone: "+1 (415) 234-8901", sessions: 6, totalSpent: "$4,200", lastSession: "Mar 28", status: "active" },
-  { name: "Leo Tran", email: "leo.tran@email.com", phone: "+1 (628) 555-0147", sessions: 3, totalSpent: "$1,050", lastSession: "Mar 15", status: "active" },
-  { name: "Ava Mitchell", email: "ava.m@email.com", phone: "+1 (510) 982-3344", sessions: 8, totalSpent: "$6,400", lastSession: "Mar 20", status: "active" },
-  { name: "Noah Caldwell", email: "noah.c@email.com", phone: "+1 (650) 771-2280", sessions: 2, totalSpent: "$3,200", lastSession: "Feb 14", status: "inactive" },
-  { name: "Iris Nakamura", email: "iris.n@email.com", phone: "+1 (408) 643-9912", sessions: 5, totalSpent: "$2,250", lastSession: "Apr 8", status: "active" },
-  { name: "Ravi Patel", email: "ravi.p@email.com", phone: "+1 (925) 338-5567", sessions: 1, totalSpent: "$275", lastSession: "Apr 10", status: "new" },
-];
+import { useData } from "@/contexts/DataContext";
+import { NewClientDialog } from "@/components/NewClientDialog";
 
 const statusColors: Record<string, string> = {
   active: "bg-mint-light text-mint",
@@ -24,6 +17,7 @@ const avatarColors = [
 ];
 
 export default function Clients() {
+  const { clients } = useData();
   return (
     <div className="space-y-6 max-w-7xl">
       <div className="flex items-center justify-between animate-fade-in-up">
@@ -31,10 +25,7 @@ export default function Clients() {
           <h1 className="text-2xl font-bold tracking-tight text-foreground" style={{ lineHeight: "1.1" }}>Clients</h1>
           <p className="mt-1 text-sm text-muted-foreground">Your client directory and session history.</p>
         </div>
-        <Button className="gap-2">
-          <Plus className="h-4 w-4" />
-          Add Client
-        </Button>
+        <NewClientDialog />
       </div>
 
       <div className="flex items-center gap-3 animate-fade-in-up" style={{ animationDelay: "80ms" }}>
@@ -49,7 +40,7 @@ export default function Clients() {
           <div
             key={c.name}
             className="card-soft p-5 animate-fade-in-up hover:translate-y-[-2px] transition-all duration-300"
-            style={{ animationDelay: `${(i + 2) * 80}ms` }}
+            style={{ animationDelay: `{(i + 2) * 80}ms` }}
           >
             <div className="flex items-start gap-3">
               <div className={`h-11 w-11 rounded-full flex items-center justify-center text-sm font-bold shrink-0 ${avatarColors[i % avatarColors.length]}`}>

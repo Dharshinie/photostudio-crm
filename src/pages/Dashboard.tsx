@@ -1,12 +1,24 @@
-import { Camera, CalendarDays, Users, DollarSign, Package, TrendingUp, ArrowUpRight } from "lucide-react";
-import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, LineChart, Line, PieChart, Pie, Cell } from "recharts";
-
-const stats = [
-  { label: "Total Bookings", value: "148", change: "+12%", icon: CalendarDays, colorClass: "stat-lavender", iconColor: "text-lavender" },
-  { label: "Revenue", value: "$24,580", change: "+8.3%", icon: DollarSign, colorClass: "stat-mint", iconColor: "text-mint" },
-  { label: "Active Clients", value: "67", change: "+5", icon: Users, colorClass: "stat-sky", iconColor: "text-sky" },
-  { label: "Pending Deliveries", value: "12", change: "-3", icon: Package, colorClass: "stat-peach", iconColor: "text-peach" },
-];
+import { useMemo, useState } from "react";
+import { useNavigate } from "react-router-dom";
+import {
+  ArrowRight,
+  BarChart3,
+  CalendarDays,
+  CheckCircle2,
+  CircleDashed,
+  Clock3,
+  IndianRupee,
+  Image,
+  PackageCheck,
+  Sparkles,
+  Users,
+} from "lucide-react";
+import { Bar, BarChart, Cell, Pie, PieChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
+import { useData, type Project, type ProjectStatus } from "@/contexts/DataContext";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Progress } from "@/components/ui/progress";
 
 const revenueData = [
   { month: "Jan", revenue: 3200 },
@@ -18,164 +30,481 @@ const revenueData = [
   { month: "Jul", revenue: 6400 },
 ];
 
-const bookingsData = [
-  { month: "Jan", bookings: 18 },
-  { month: "Feb", bookings: 24 },
-  { month: "Mar", bookings: 20 },
-  { month: "Apr", bookings: 28 },
-  { month: "May", bookings: 22 },
-  { month: "Jun", bookings: 31 },
-  { month: "Jul", bookings: 26 },
+const deliveryBreakdown = [
+  { name: "Editing", value: 2, color: "#7c3aed" },
+  { name: "In Progress", value: 1, color: "#2563eb" },
+  { name: "Exporting", value: 1, color: "#0f766e" },
+  { name: "Packing", value: 1, color: "#ea580c" },
+  { name: "Delivered", value: 1, color: "#16a34a" },
 ];
 
-const sessionTypes = [
-  { name: "Portraits", value: 38, color: "hsl(262, 52%, 58%)" },
-  { name: "Weddings", value: 24, color: "hsl(162, 48%, 48%)" },
-  { name: "Events", value: 20, color: "hsl(210, 70%, 58%)" },
-  { name: "Product", value: 18, color: "hsl(18, 85%, 65%)" },
+const projectStatusOptions: Array<{ value: ProjectStatus; label: string; helper: string }> = [
+  { value: "editing", label: "Editing Started", helper: "Retouching and color correction" },
+  { value: "in-progress", label: "In Progress", helper: "Active work in the production queue" },
+  { value: "exporting", label: "Exporting", helper: "Generating final files and gallery assets" },
+  { value: "packing", label: "Packing", helper: "Preparing links, folders, and delivery notes" },
+  { value: "delivered", label: "Delivered", helper: "Client-ready and sent" },
 ];
 
-const recentBookings = [
-  { client: "Mara Jensen", type: "Wedding", date: "Mar 28", status: "confirmed" },
-  { client: "Leo Tran", type: "Portrait", date: "Mar 30", status: "pending" },
-  { client: "Ava Mitchell", type: "Product", date: "Apr 2", status: "confirmed" },
-  { client: "Noah Caldwell", type: "Event", date: "Apr 5", status: "pending" },
-  { client: "Iris Nakamura", type: "Portrait", date: "Apr 8", status: "completed" },
-];
+const statusUi: Record<ProjectStatus, { label: string; badge: string; dot: string }> = {
+  editing: {
+    label: "Editing",
+    badge: "border-violet-200 bg-violet-50 text-violet-700",
+    dot: "bg-violet-500",
+  },
+  "in-progress": {
+    label: "In Progress",
+    badge: "border-blue-200 bg-blue-50 text-blue-700",
+    dot: "bg-blue-500",
+  },
+  exporting: {
+    label: "Exporting",
+    badge: "border-teal-200 bg-teal-50 text-teal-700",
+    dot: "bg-teal-500",
+  },
+  packing: {
+    label: "Packing",
+    badge: "border-orange-200 bg-orange-50 text-orange-700",
+    dot: "bg-orange-500",
+  },
+  delivered: {
+    label: "Delivered",
+    badge: "border-emerald-200 bg-emerald-50 text-emerald-700",
+    dot: "bg-emerald-500",
+  },
+};
 
-const statusColors: Record<string, string> = {
-  confirmed: "bg-mint-light text-mint",
-  pending: "bg-peach-light text-peach",
-  completed: "bg-lavender-light text-lavender",
+const priorityUi = {
+  High: "bg-rose-50 text-rose-700 border-rose-200",
+  Medium: "bg-amber-50 text-amber-700 border-amber-200",
+  Low: "bg-slate-100 text-slate-700 border-slate-200",
 };
 
 export default function Dashboard() {
-  return (
-    <div className="space-y-8 max-w-7xl">
-      {/* Header */}
-      <div className="animate-fade-in-up">
-        <h1 className="text-2xl font-bold tracking-tight text-foreground" style={{ lineHeight: "1.1" }}>
-          Dashboard
-        </h1>
-        <p className="mt-1 text-sm text-muted-foreground">Welcome back, here's what's happening today.</p>
-      </div>
+  const navigate = useNavigate();
+  const { clients, bookings, projects, albums, updateProjectStatus } = useData();
+  const [selectedProject, setSelectedProject] = useState<Project | null>(null);
 
-      {/* Stats */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-        {stats.map((s, i) => (
-          <div
-            key={s.label}
-            className={`card-soft p-5 ${s.colorClass} animate-fade-in-up`}
-            style={{ animationDelay: `${i * 80}ms` }}
-          >
-            <div className="flex items-start justify-between">
-              <div>
-                <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide">{s.label}</p>
-                <p className="mt-2 text-2xl font-bold text-foreground" style={{ fontVariantNumeric: "tabular-nums" }}>
-                  {s.value}
+  const totalRevenue = bookings.reduce((sum, booking) => sum + parseInt(booking.amount.replace(/[^\d]/g, ""), 10), 0);
+  const activeClients = clients.filter((client) => client.status === "active").length;
+  const pendingDeliveries = projects.filter((project) => project.status !== "delivered").length;
+  const recentProjects = projects.slice(0, 4);
+  const pendingProjects = projects.filter((project) => project.status !== "delivered");
+  const albumReviewQueue = albums.filter((album) => album.selectedPhotoIds.length > 0 || album.status === "editing");
+
+  const averageCompletion = useMemo(() => {
+    if (!projects.length) {
+      return 0;
+    }
+    return Math.round(projects.reduce((sum, project) => sum + project.completion, 0) / projects.length);
+  }, [projects]);
+
+  const stats = [
+    {
+      label: "Total Bookings",
+      value: bookings.length.toString(),
+      meta: "+12% vs last month",
+      icon: CalendarDays,
+      accent: "from-violet-100 via-white to-violet-50",
+      iconWrap: "bg-violet-600",
+    },
+    {
+      label: "Revenue",
+      value: `Rs.${totalRevenue.toLocaleString()}`,
+      meta: "Premium sessions driving growth",
+      icon: IndianRupee,
+      accent: "from-emerald-100 via-white to-emerald-50",
+      iconWrap: "bg-emerald-600",
+    },
+    {
+      label: "Active Clients",
+      value: activeClients.toString(),
+      meta: "High-retention client relationships",
+      icon: Users,
+      accent: "from-sky-100 via-white to-sky-50",
+      iconWrap: "bg-sky-600",
+    },
+    {
+      label: "Pending Deliveries",
+      value: pendingDeliveries.toString(),
+      meta: `${averageCompletion}% average completion`,
+      icon: PackageCheck,
+      accent: "from-orange-100 via-white to-orange-50",
+      iconWrap: "bg-orange-500",
+    },
+    {
+      label: "Album Picks",
+      value: albumReviewQueue.reduce((sum, album) => sum + album.selectedPhotoIds.length, 0).toString(),
+      meta: "Selections synced from client albums",
+      icon: Image,
+      accent: "from-cyan-100 via-white to-sky-50",
+      iconWrap: "bg-cyan-500",
+    },
+  ];
+
+  return (
+    <>
+      <div className="mx-auto max-w-7xl space-y-8">
+        <section className="glass overflow-hidden rounded-[2rem] border border-white/70 px-6 py-7 shadow-xl">
+          <div className="grid gap-8 xl:grid-cols-[1.5fr_1fr] xl:items-center">
+            <div className="space-y-4">
+              <Badge className="w-fit border-0 bg-violet-100 px-4 py-1 text-violet-700 hover:bg-violet-100">
+                Studio Analytics
+              </Badge>
+              <div className="space-y-3">
+                <h1 className="text-3xl font-extrabold tracking-tight text-slate-800 md:text-4xl">
+                  Production dashboard for bookings, revenue, and active projects
+                </h1>
+                <p className="max-w-2xl text-sm leading-7 text-slate-600 md:text-base">
+                  Track studio performance, monitor pending work, and update delivery statuses without leaving the dashboard.
                 </p>
               </div>
-              <div className={`flex h-10 w-10 items-center justify-center rounded-xl ${s.iconColor} bg-card`}>
-                <s.icon className="h-5 w-5" />
+            </div>
+
+            <div className="grid gap-4 sm:grid-cols-3 xl:grid-cols-1">
+              <HeroMetric label="Projects in Queue" value={`${pendingProjects.length}`} helper="Open production tasks" />
+              <HeroMetric label="Delivered This Cycle" value={`${projects.filter((project) => project.status === "delivered").length}`} helper="Completed and shared" />
+              <HeroMetric label="Avg Completion" value={`${averageCompletion}%`} helper="Across active projects" />
+            </div>
+          </div>
+        </section>
+
+        <section className="grid gap-5 sm:grid-cols-2 xl:grid-cols-5">
+          {stats.map((item) => (
+            <div
+              key={item.label}
+              className={`overflow-hidden rounded-[1.6rem] border border-white/70 bg-gradient-to-br ${item.accent} p-5 shadow-lg shadow-slate-200/50`}
+            >
+              <div className="flex items-start justify-between gap-4">
+                <div>
+                  <p className="text-xs font-semibold uppercase tracking-[0.2em] text-slate-500">{item.label}</p>
+                  <p className="mt-3 text-3xl font-bold tracking-tight text-slate-800">{item.value}</p>
+                  <p className="mt-2 text-sm text-slate-500">{item.meta}</p>
+                </div>
+                <div className={`flex h-12 w-12 items-center justify-center rounded-2xl text-white shadow-md ${item.iconWrap}`}>
+                  <item.icon className="h-5 w-5" />
+                </div>
               </div>
             </div>
-            <div className="mt-3 flex items-center gap-1 text-xs font-medium text-mint">
-              <ArrowUpRight className="h-3.5 w-3.5" />
-              {s.change} <span className="text-muted-foreground font-normal">vs last month</span>
-            </div>
-          </div>
-        ))}
-      </div>
+          ))}
+        </section>
 
-      {/* Charts row */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
-        {/* Revenue chart */}
-        <div className="card-soft p-5 lg:col-span-2 animate-fade-in-up" style={{ animationDelay: "320ms" }}>
-          <div className="flex items-center justify-between mb-4">
-            <h2 className="text-sm font-semibold text-foreground">Revenue Overview</h2>
-            <span className="flex items-center gap-1 text-xs text-mint font-medium">
-              <TrendingUp className="h-3.5 w-3.5" /> +18.2%
-            </span>
-          </div>
-          <ResponsiveContainer width="100%" height={240}>
-            <BarChart data={revenueData} barSize={28}>
-              <CartesianGrid strokeDasharray="3 3" stroke="hsl(240,14%,90%)" vertical={false} />
-              <XAxis dataKey="month" tick={{ fontSize: 12 }} stroke="hsl(240,8%,52%)" axisLine={false} tickLine={false} />
-              <YAxis tick={{ fontSize: 12 }} stroke="hsl(240,8%,52%)" axisLine={false} tickLine={false} tickFormatter={(v) => `$${v / 1000}k`} />
-              <Tooltip
-                contentStyle={{ borderRadius: 12, border: "1px solid hsl(240,14%,90%)", boxShadow: "0 4px 14px hsl(240 20% 16% / 0.08)" }}
-                formatter={(value: number) => [`$${value.toLocaleString()}`, "Revenue"]}
-              />
-              <Bar dataKey="revenue" fill="hsl(262, 52%, 58%)" radius={[6, 6, 0, 0]} />
-            </BarChart>
-          </ResponsiveContainer>
-        </div>
-
-        {/* Session types donut */}
-        <div className="card-soft p-5 animate-fade-in-up" style={{ animationDelay: "400ms" }}>
-          <h2 className="text-sm font-semibold text-foreground mb-4">Session Types</h2>
-          <ResponsiveContainer width="100%" height={180}>
-            <PieChart>
-              <Pie data={sessionTypes} cx="50%" cy="50%" innerRadius={50} outerRadius={75} paddingAngle={4} dataKey="value" stroke="none">
-                {sessionTypes.map((entry, i) => (
-                  <Cell key={i} fill={entry.color} />
-                ))}
-              </Pie>
-              <Tooltip
-                contentStyle={{ borderRadius: 12, border: "1px solid hsl(240,14%,90%)" }}
-                formatter={(value: number, name: string) => [`${value}%`, name]}
-              />
-            </PieChart>
-          </ResponsiveContainer>
-          <div className="mt-2 grid grid-cols-2 gap-2">
-            {sessionTypes.map((t) => (
-              <div key={t.name} className="flex items-center gap-2 text-xs text-muted-foreground">
-                <span className="h-2.5 w-2.5 rounded-full" style={{ backgroundColor: t.color }} />
-                {t.name}
+        <section className="grid gap-6 xl:grid-cols-[1.75fr_1fr]">
+          <div className="card-soft rounded-[1.75rem] p-6 shadow-xl">
+            <div className="mb-6 flex items-center justify-between">
+              <div>
+                <h2 className="text-lg font-bold text-slate-800">Revenue Overview</h2>
+                <p className="mt-1 text-sm text-slate-500">Monthly studio revenue performance.</p>
               </div>
-            ))}
+              <Badge className="border-0 bg-emerald-100 text-emerald-700 hover:bg-emerald-100">
+                +18.2%
+              </Badge>
+            </div>
+            <ResponsiveContainer width="100%" height={300}>
+              <BarChart data={revenueData} barCategoryGap={18}>
+                <XAxis dataKey="month" axisLine={false} tickLine={false} tick={{ fontSize: 12, fill: "#64748b" }} />
+                <YAxis axisLine={false} tickLine={false} tick={{ fontSize: 12, fill: "#64748b" }} tickFormatter={(value) => `Rs.${value / 1000}k`} />
+                <Tooltip
+                  cursor={{ fill: "rgba(99, 102, 241, 0.06)" }}
+                  contentStyle={{
+                    borderRadius: "18px",
+                    border: "1px solid rgba(226, 232, 240, 1)",
+                    boxShadow: "0 20px 45px -20px rgba(15, 23, 42, 0.25)",
+                  }}
+                  formatter={(value: number) => [`Rs.${value.toLocaleString()}`, "Revenue"]}
+                />
+                <Bar dataKey="revenue" radius={[12, 12, 0, 0]} fill="url(#revenueGradient)" />
+                <defs>
+                  <linearGradient id="revenueGradient" x1="0" x2="0" y1="0" y2="1">
+                    <stop offset="0%" stopColor="#7c3aed" />
+                    <stop offset="100%" stopColor="#38bdf8" />
+                  </linearGradient>
+                </defs>
+              </BarChart>
+            </ResponsiveContainer>
           </div>
-        </div>
-      </div>
 
-      {/* Bottom row */}
-      <div className="grid grid-cols-1 lg:grid-cols-5 gap-4">
-        {/* Bookings trend */}
-        <div className="card-soft p-5 lg:col-span-2 animate-fade-in-up" style={{ animationDelay: "480ms" }}>
-          <h2 className="text-sm font-semibold text-foreground mb-4">Booking Trends</h2>
-          <ResponsiveContainer width="100%" height={200}>
-            <LineChart data={bookingsData}>
-              <CartesianGrid strokeDasharray="3 3" stroke="hsl(240,14%,90%)" vertical={false} />
-              <XAxis dataKey="month" tick={{ fontSize: 12 }} stroke="hsl(240,8%,52%)" axisLine={false} tickLine={false} />
-              <YAxis tick={{ fontSize: 12 }} stroke="hsl(240,8%,52%)" axisLine={false} tickLine={false} />
-              <Tooltip contentStyle={{ borderRadius: 12, border: "1px solid hsl(240,14%,90%)" }} />
-              <Line type="monotone" dataKey="bookings" stroke="hsl(210, 70%, 58%)" strokeWidth={2.5} dot={{ r: 4, fill: "hsl(210, 70%, 58%)" }} />
-            </LineChart>
-          </ResponsiveContainer>
-        </div>
-
-        {/* Recent bookings */}
-        <div className="card-soft p-5 lg:col-span-3 animate-fade-in-up" style={{ animationDelay: "560ms" }}>
-          <h2 className="text-sm font-semibold text-foreground mb-4">Recent Bookings</h2>
-          <div className="space-y-3">
-            {recentBookings.map((b) => (
-              <div key={b.client} className="flex items-center justify-between py-2 border-b border-border/40 last:border-0">
-                <div className="flex items-center gap-3">
-                  <div className="h-8 w-8 rounded-full bg-accent flex items-center justify-center text-xs font-semibold text-accent-foreground">
-                    {b.client.split(" ").map((n) => n[0]).join("")}
+          <div className="card-soft rounded-[1.75rem] p-6 shadow-xl">
+            <div className="mb-6">
+              <h2 className="text-lg font-bold text-slate-800">Delivery Pipeline</h2>
+              <p className="mt-1 text-sm text-slate-500">Current project status distribution.</p>
+            </div>
+            <ResponsiveContainer width="100%" height={260}>
+              <PieChart>
+                <Pie data={deliveryBreakdown} dataKey="value" nameKey="name" innerRadius={70} outerRadius={96} stroke="none" paddingAngle={4}>
+                  {deliveryBreakdown.map((entry) => (
+                    <Cell key={entry.name} fill={entry.color} />
+                  ))}
+                </Pie>
+                <Tooltip
+                  contentStyle={{
+                    borderRadius: "18px",
+                    border: "1px solid rgba(226, 232, 240, 1)",
+                    boxShadow: "0 20px 45px -20px rgba(15, 23, 42, 0.25)",
+                  }}
+                  formatter={(value: number, name: string) => [value, name]}
+                />
+              </PieChart>
+            </ResponsiveContainer>
+            <div className="mt-4 grid gap-3">
+              {deliveryBreakdown.map((entry) => (
+                <div key={entry.name} className="flex items-center justify-between rounded-2xl bg-slate-50 px-4 py-3">
+                  <div className="flex items-center gap-3">
+                    <span className="h-3 w-3 rounded-full" style={{ backgroundColor: entry.color }} />
+                    <span className="text-sm font-medium text-slate-700">{entry.name}</span>
                   </div>
-                  <div>
-                    <p className="text-sm font-medium text-foreground">{b.client}</p>
-                    <p className="text-xs text-muted-foreground">{b.type} · {b.date}</p>
+                  <span className="text-sm font-semibold text-slate-500">{entry.value}</span>
+                </div>
+              ))}
+            </div>
+          </div>
+        </section>
+
+        <section className="grid gap-6 xl:grid-cols-[1.5fr_1fr]">
+          <div className="card-soft rounded-[1.75rem] p-6 shadow-xl">
+            <div className="mb-5 flex items-center justify-between gap-4">
+              <div>
+                <h2 className="text-lg font-bold text-slate-800">Recent Projects</h2>
+                <p className="mt-1 text-sm text-slate-500">Quickly jump into active client work.</p>
+              </div>
+              <div className="rounded-full bg-slate-100 px-4 py-2 text-sm font-medium text-slate-600">
+                {recentProjects.length} active cards
+              </div>
+            </div>
+
+            <div className="grid gap-4 md:grid-cols-2">
+              {recentProjects.map((project) => (
+                <ProjectCard
+                  key={project.id}
+                  project={project}
+                  onQuickUpdate={() => setSelectedProject(project)}
+                  onOpenProject={() => navigate(`/projects/${project.id}`)}
+                />
+              ))}
+            </div>
+          </div>
+
+          <div className="card-soft rounded-[1.75rem] p-6 shadow-xl">
+            <div className="mb-5 flex items-center justify-between">
+              <div>
+                <h2 className="text-lg font-bold text-slate-800">Pending Work</h2>
+                <p className="mt-1 text-sm text-slate-500">Priority queue for studio delivery.</p>
+              </div>
+              <CircleDashed className="h-5 w-5 text-slate-400" />
+            </div>
+            <div className="space-y-4">
+              {pendingProjects.map((project) => (
+                <div key={project.id} className="rounded-[1.4rem] border border-slate-200/80 bg-white/80 p-4 shadow-sm">
+                  <div className="flex items-start justify-between gap-4">
+                    <div>
+                      <p className="text-sm font-semibold text-slate-800">{project.clientName}</p>
+                      <p className="mt-1 text-sm text-slate-500">{project.projectName}</p>
+                    </div>
+                    <Badge variant="outline" className={priorityUi[project.priority]}>
+                      {project.priority}
+                    </Badge>
+                  </div>
+                  <div className="mt-4 space-y-2">
+                    <div className="flex items-center justify-between text-xs font-medium text-slate-500">
+                      <span>{statusUi[project.status].label}</span>
+                      <span>{project.completion}%</span>
+                    </div>
+                    <Progress value={project.completion} className="h-2 bg-slate-200" />
+                  </div>
+                  <div className="mt-4 flex items-center justify-between text-xs text-slate-500">
+                    <span>Due {project.dueDate}</span>
+                    <button
+                      onClick={() => setSelectedProject(project)}
+                      className="font-semibold text-violet-600 transition-colors hover:text-violet-500"
+                    >
+                      Quick Update
+                    </button>
                   </div>
                 </div>
-                <span className={`text-xs font-medium px-2.5 py-1 rounded-full ${statusColors[b.status]}`}>
-                  {b.status}
-                </span>
-              </div>
-            ))}
+              ))}
+            </div>
           </div>
+        </section>
+
+        <section className="card-soft rounded-[1.75rem] p-6 shadow-xl">
+          <div className="mb-5 flex items-center justify-between">
+            <div>
+              <h2 className="text-lg font-bold text-slate-800">Album Review Queue</h2>
+              <p className="mt-1 text-sm text-slate-500">Client-selected images that are ready for admin review and editing.</p>
+            </div>
+            <div className="rounded-full bg-slate-100 px-4 py-2 text-sm font-medium text-slate-600">
+              {albumReviewQueue.length} albums
+            </div>
+          </div>
+
+          <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
+            {albumReviewQueue.length ? albumReviewQueue.map((album) => (
+              <div key={album.recordId || album.albumId} className="rounded-[1.4rem] border border-slate-200/80 bg-white/85 p-5 shadow-sm">
+                <div className="flex items-start justify-between gap-3">
+                  <div>
+                    <p className="text-base font-bold text-slate-800">{album.title}</p>
+                    <p className="mt-1 text-sm text-slate-500">{album.clientName}</p>
+                  </div>
+                  <Badge variant="outline" className="border-cyan-200 bg-cyan-50 text-cyan-700">
+                    {album.status}
+                  </Badge>
+                </div>
+                <div className="mt-4 grid grid-cols-3 gap-3 text-center">
+                  <AlbumMetric label="Album ID" value={album.albumId} />
+                  <AlbumMetric label="Passcode" value={album.passcode} />
+                  <AlbumMetric label="Picks" value={String(album.selectedPhotoIds.length)} />
+                </div>
+                <div className="mt-4 text-sm text-slate-500">
+                  {album.selectedPhotoIds.length
+                    ? `${album.selectedPhotoIds.length} images selected by client. Open Gallery to review and start editing.`
+                    : "Waiting for client selections."}
+                </div>
+                <div className="mt-4">
+                  <Button variant="outline" onClick={() => navigate("/gallery")} className="w-full">
+                    Open Gallery Review
+                  </Button>
+                </div>
+              </div>
+            )) : (
+              <div className="rounded-[1.4rem] border border-dashed border-slate-300 bg-slate-50 p-6 text-sm text-slate-500">
+                No album selections yet. Once a client opens an album and picks photos, they will appear here automatically.
+              </div>
+            )}
+          </div>
+        </section>
+      </div>
+
+      <Dialog open={Boolean(selectedProject)} onOpenChange={(open) => !open && setSelectedProject(null)}>
+        <DialogContent className="max-w-lg rounded-[1.75rem] border-white/70 bg-white/95 p-0 shadow-2xl">
+          {selectedProject && (
+            <div className="overflow-hidden rounded-[1.75rem]">
+              <div className="bg-gradient-to-r from-violet-600 via-indigo-600 to-sky-500 px-6 py-6 text-white">
+                <DialogHeader className="text-left">
+                  <DialogTitle className="text-2xl font-bold">{selectedProject.projectName}</DialogTitle>
+                  <DialogDescription className="text-violet-100">
+                    Update the live production status for {selectedProject.clientName} without leaving the dashboard.
+                  </DialogDescription>
+                </DialogHeader>
+              </div>
+
+              <div className="space-y-5 p-6">
+                <div className="rounded-[1.25rem] bg-slate-50 p-4">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <p className="text-sm font-semibold text-slate-800">{selectedProject.clientName}</p>
+                      <p className="mt-1 text-sm text-slate-500">{selectedProject.projectType}</p>
+                    </div>
+                    <Badge variant="outline" className={statusUi[selectedProject.status].badge}>
+                      {statusUi[selectedProject.status].label}
+                    </Badge>
+                  </div>
+                </div>
+
+                <div className="space-y-3">
+                  {projectStatusOptions.map((option) => {
+                    const active = selectedProject.status === option.value;
+                    return (
+                      <button
+                        key={option.value}
+                        onClick={() => {
+                          updateProjectStatus(selectedProject.id, option.value);
+                          setSelectedProject(null);
+                        }}
+                        className={`w-full rounded-[1.25rem] border px-4 py-4 text-left transition-all ${
+                          active
+                            ? "border-violet-300 bg-violet-50 shadow-sm"
+                            : "border-slate-200 bg-white hover:border-violet-200 hover:bg-violet-50/60"
+                        }`}
+                      >
+                        <div className="flex items-center justify-between gap-4">
+                          <div>
+                            <p className="text-sm font-semibold text-slate-800">{option.label}</p>
+                            <p className="mt-1 text-sm text-slate-500">{option.helper}</p>
+                          </div>
+                          {active ? <CheckCircle2 className="h-5 w-5 text-violet-600" /> : <Clock3 className="h-5 w-5 text-slate-300" />}
+                        </div>
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+            </div>
+          )}
+        </DialogContent>
+      </Dialog>
+    </>
+  );
+}
+
+function AlbumMetric({ label, value }: { label: string; value: string }) {
+  return (
+    <div className="rounded-xl bg-slate-50 px-3 py-3">
+      <p className="text-[10px] font-semibold uppercase tracking-wide text-slate-500">{label}</p>
+      <p className="mt-1 text-sm font-semibold text-slate-800">{value}</p>
+    </div>
+  );
+}
+
+function HeroMetric({ label, value, helper }: { label: string; value: string; helper: string }) {
+  return (
+    <div className="rounded-[1.5rem] border border-white/70 bg-white/75 p-5 shadow-sm">
+      <p className="text-sm font-medium text-slate-500">{label}</p>
+      <p className="mt-2 text-3xl font-bold text-slate-800">{value}</p>
+      <p className="mt-1 text-sm text-slate-500">{helper}</p>
+    </div>
+  );
+}
+
+function ProjectCard({
+  project,
+  onQuickUpdate,
+  onOpenProject,
+}: {
+  project: Project;
+  onQuickUpdate: () => void;
+  onOpenProject: () => void;
+}) {
+  return (
+    <div className="rounded-[1.5rem] border border-slate-200/80 bg-white/85 p-5 shadow-md shadow-slate-200/40">
+      <div className="flex items-start justify-between gap-3">
+        <div>
+          <p className="text-base font-bold text-slate-800">{project.clientName}</p>
+          <p className="mt-1 text-sm text-slate-500">{project.projectName}</p>
         </div>
+        <Badge variant="outline" className={statusUi[project.status].badge}>
+          <span className={`mr-2 inline-block h-2 w-2 rounded-full ${statusUi[project.status].dot}`} />
+          {statusUi[project.status].label}
+        </Badge>
+      </div>
+
+      <div className="mt-5 space-y-3">
+        <div className="flex items-center justify-between text-sm text-slate-500">
+          <span>{project.projectType}</span>
+          <span>Due {project.dueDate}</span>
+        </div>
+        <Progress value={project.completion} className="h-2 bg-slate-200" />
+        <div className="flex items-center justify-between text-sm">
+          <span className="text-slate-500">{project.deliverables}</span>
+          <span className="font-semibold text-slate-700">{project.completion}%</span>
+        </div>
+      </div>
+
+      <div className="mt-5 flex flex-wrap gap-3">
+        <Button
+          onClick={onOpenProject}
+          className="h-11 rounded-full bg-slate-900 px-5 text-white shadow-md hover:bg-slate-800"
+        >
+          Open Project
+          <ArrowRight className="ml-2 h-4 w-4" />
+        </Button>
+        <Button
+          variant="outline"
+          onClick={onQuickUpdate}
+          className="h-11 rounded-full border-slate-200 bg-white px-5 text-slate-700 hover:bg-slate-50"
+        >
+          <Sparkles className="mr-2 h-4 w-4 text-violet-500" />
+          Quick Update
+        </Button>
       </div>
     </div>
   );

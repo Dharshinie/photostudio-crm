@@ -9,6 +9,7 @@ import { Eye, EyeOff, User, Mail, Lock } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 
 const Signup = () => {
+  const navigate = useNavigate();
   const [formData, setFormData] = useState({
     name: "",
     email: "",
@@ -18,43 +19,49 @@ const Signup = () => {
   });
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
-  const navigate = useNavigate();
-  const { login } = useAuth();
+  const { signup } = useAuth();
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (formData.password !== formData.confirmPassword) {
+      alert("Passwords don't match");
       return;
     }
-    // Mock signup and login immediately
-    login(formData.email, formData.password, formData.role);
 
-    if (formData.role === "admin") {
-      navigate("/");
-    } else {
-      navigate("/client-dashboard");
+    try {
+      await signup(formData.email, formData.password, formData.role, formData.name);
+      // Redirect based on role
+      if (formData.role === "admin") {
+        navigate("/");
+      } else {
+        navigate("/client-dashboard");
+      }
+    } catch (error: unknown) {
+      const message = error instanceof Error ? error.message : 'Signup failed';
+      alert(`Signup failed: ${message}`);
     }
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-sky-light via-white to-lavender-light flex items-center justify-center px-4 py-8">
-      <Card className="glass w-full max-w-md rounded-[2rem] border border-white/70 shadow-2xl">
+    <div className="auth-scene flex min-h-screen items-center justify-center px-4 py-8">
+      <div className="relative z-10 w-full max-w-md">
+      <Card className="w-full rounded-[2rem] border border-violet-300/35 bg-violet-950/20 shadow-[0_24px_80px_-24px_rgba(7,2,28,0.8)] backdrop-blur-2xl">
         <CardHeader className="space-y-2 text-center">
-          <CardTitle className="text-3xl font-extrabold tracking-tight text-slate-800">Create Account</CardTitle>
-          <CardDescription className="text-base text-slate-500">
+          <CardTitle className="text-3xl font-extrabold tracking-tight text-white">Create Account</CardTitle>
+          <CardDescription className="text-base text-violet-100/70">
             Join Bloom Studio CRM
           </CardDescription>
         </CardHeader>
         <CardContent>
           <form onSubmit={handleSubmit} className="space-y-4">
             <div className="space-y-2">
-              <Label htmlFor="name" className="text-sm font-semibold text-slate-700">Full Name</Label>
+              <Label htmlFor="name" className="text-sm font-semibold text-violet-50">Full Name</Label>
               <div className="relative">
-                <User className="absolute left-3 top-3 h-4 w-4 text-slate-400" />
+                <User className="absolute left-3 top-4 h-4 w-4 text-grey-100/65" />
                 <Input
                   id="name"
                   name="name"
@@ -62,15 +69,15 @@ const Signup = () => {
                   placeholder="Enter your full name"
                   value={formData.name}
                   onChange={handleChange}
-                  className="h-12 rounded-2xl border-slate-200 bg-white/85 pl-10 text-slate-800 placeholder:text-slate-400 focus-visible:ring-2 focus-visible:ring-primary/40 focus-visible:ring-offset-0"
+                  className="h-12 rounded-full border border-violet-200/20 bg-white/12 pl-10 text-grey placeholder:text-grey-100/45 focus-visible:ring-2 focus-visible:ring-violet-300/45 focus-visible:ring-offset-0"
                   required
                 />
               </div>
             </div>
             <div className="space-y-2">
-              <Label htmlFor="email" className="text-sm font-semibold text-slate-700">Email</Label>
+              <Label htmlFor="email" className="text-sm font-semibold text-violet-50">Email</Label>
               <div className="relative">
-                <Mail className="absolute left-3 top-3 h-4 w-4 text-slate-400" />
+                <Mail className="absolute left-3 top-4 h-4 w-4 text-grey-100/65" />
                 <Input
                   id="email"
                   name="email"
@@ -78,15 +85,15 @@ const Signup = () => {
                   placeholder="Enter your email"
                   value={formData.email}
                   onChange={handleChange}
-                  className="h-12 rounded-2xl border-slate-200 bg-white/85 pl-10 text-slate-800 placeholder:text-slate-400 focus-visible:ring-2 focus-visible:ring-primary/40 focus-visible:ring-offset-0"
+                  className="h-12 rounded-full border border-violet-200/20 bg-white/12 pl-10 text-grey placeholder:text-grey-100/45 focus-visible:ring-2 focus-visible:ring-violet-300/45 focus-visible:ring-offset-0"
                   required
                 />
               </div>
             </div>
             <div className="space-y-2">
-              <Label htmlFor="password" className="text-sm font-semibold text-slate-700">Password</Label>
+              <Label htmlFor="password" className="text-sm font-semibold text-violet-50">Password</Label>
               <div className="relative">
-                <Lock className="absolute left-3 top-3 h-4 w-4 text-slate-400" />
+                <Lock className="absolute left-3 top-4 h-4 w-4 text-grey-100/65" />
                 <Input
                   id="password"
                   name="password"
@@ -94,37 +101,37 @@ const Signup = () => {
                   placeholder="Enter your password"
                   value={formData.password}
                   onChange={handleChange}
-                  className="h-12 rounded-2xl border-slate-200 bg-white/85 pl-10 pr-10 text-slate-800 placeholder:text-slate-400 focus-visible:ring-2 focus-visible:ring-primary/40 focus-visible:ring-offset-0"
+                  className="h-12 rounded-full border border-violet-200/20 bg-white/12 pl-10 pr-10 text-grey placeholder:text-grey-100/45 focus-visible:ring-2 focus-visible:ring-violet-300/45 focus-visible:ring-offset-0"
                   required
                 />
                 <button
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
-                  className="absolute right-3 top-3 text-slate-400 transition-colors hover:text-slate-600"
+                  className="absolute right-3 top-4 text-violet-100/65 transition-colors hover:text-white"
                 >
                   {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
                 </button>
               </div>
             </div>
             <div className="space-y-2">
-              <Label htmlFor="role" className="text-sm font-semibold text-slate-700">Role</Label>
+              <Label htmlFor="role" className="text-sm font-semibold text-violet-50">Role</Label>
               <Select
                 value={formData.role}
                 onValueChange={(value) => setFormData((prev) => ({ ...prev, role: value }))}
               >
-                <SelectTrigger className="h-12 w-full rounded-2xl border-slate-200 bg-white/85 text-slate-800 focus:ring-primary/40 focus:ring-offset-0">
+                <SelectTrigger className="h-12 w-full rounded-full border border-violet-200/20 bg-white/12 text-white focus:ring-violet-300/45 focus:ring-offset-0">
                   <SelectValue placeholder="Select role" />
                 </SelectTrigger>
-                <SelectContent className="border-white/70 bg-white/95 text-slate-800">
+                <SelectContent className="border-violet-200/20 bg-violet-950/95 text-white">
                   <SelectItem value="client">Client</SelectItem>
                   <SelectItem value="admin">Admin</SelectItem>
                 </SelectContent>
               </Select>
             </div>
             <div className="space-y-2">
-              <Label htmlFor="confirmPassword" className="text-sm font-semibold text-slate-700">Confirm Password</Label>
+              <Label htmlFor="confirmPassword" className="text-sm font-semibold text-violet-50">Confirm Password</Label>
               <div className="relative">
-                <Lock className="absolute left-3 top-3 h-4 w-4 text-slate-400" />
+                <Lock className="absolute left-3 top-4 h-4 w-4 text-grey-100/65" />
                 <Input
                   id="confirmPassword"
                   name="confirmPassword"
@@ -132,13 +139,13 @@ const Signup = () => {
                   placeholder="Confirm your password"
                   value={formData.confirmPassword}
                   onChange={handleChange}
-                  className="h-12 rounded-2xl border-slate-200 bg-white/85 pl-10 pr-10 text-slate-800 placeholder:text-slate-400 focus-visible:ring-2 focus-visible:ring-primary/40 focus-visible:ring-offset-0"
+                  className="h-12 rounded-full border border-violet-200/20 bg-white/12 pl-10 pr-10 text-grey placeholder:text-grey-100/45 focus-visible:ring-2 focus-visible:ring-violet-300/45 focus-visible:ring-offset-0"
                   required
                 />
                 <button
                   type="button"
                   onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                  className="absolute right-3 top-3 text-slate-400 transition-colors hover:text-slate-600"
+                  className="absolute right-3 top-4 text-grey-100/65 transition-colors hover:text-white"
                 >
                   {showConfirmPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
                 </button>
@@ -146,21 +153,22 @@ const Signup = () => {
             </div>
             <Button
               type="submit"
-              className="h-12 w-full rounded-2xl bg-gradient-to-r from-indigo-600 via-violet-600 to-sky-500 font-semibold text-white shadow-lg shadow-indigo-500/25 transition-transform hover:-translate-y-0.5 hover:opacity-95"
+              className="h-12 w-full rounded-full bg-white text-violet-900 shadow-lg shadow-black/25 transition-transform hover:-translate-y-0.5 hover:bg-violet-50"
             >
               Sign Up
             </Button>
           </form>
           <div className="mt-6 text-center">
-            <p className="text-slate-500">
+            <p className="text-violet-100/75">
               Already have an account?{" "}
-              <Link to="/login" className="font-semibold text-indigo-600 hover:text-indigo-500 hover:underline">
+              <Link to="/login" className="font-semibold text-white hover:text-violet-100 hover:underline">
                 Sign in
               </Link>
             </p>
           </div>
         </CardContent>
       </Card>
+      </div>
     </div>
   );
 };

@@ -122,7 +122,7 @@ function StudioSettings() {
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
         <div className="space-y-1.5">
           <label className="text-xs font-medium text-muted-foreground uppercase tracking-wide">Studio Name</label>
-          <Input defaultValue="Sinclair Studios" />
+          <Input defaultValue="Bloom Studios" />
         </div>
         <div className="space-y-1.5">
           <label className="text-xs font-medium text-muted-foreground uppercase tracking-wide">Website</label>
@@ -130,16 +130,16 @@ function StudioSettings() {
             <span className="flex h-10 items-center rounded-l-md border border-r-0 border-input bg-muted px-3 text-sm text-muted-foreground">
               <Globe className="h-3.5 w-3.5" />
             </span>
-            <Input defaultValue="sinclairphotography.com" className="rounded-l-none" />
+            <Input defaultValue="Bloomphotography.com" className="rounded-l-none" />
           </div>
         </div>
         <div className="space-y-1.5 sm:col-span-2">
           <label className="text-xs font-medium text-muted-foreground uppercase tracking-wide">Address</label>
-          <Input defaultValue="782 Valencia St, San Francisco, CA 94110" />
+          <Input defaultValue="782 Valencia St,ooty" />
         </div>
         <div className="space-y-1.5">
           <label className="text-xs font-medium text-muted-foreground uppercase tracking-wide">Default Session Rate</label>
-          <Input defaultValue="$350" />
+          <Input defaultValue="Rs.10000" />
         </div>
         <div className="space-y-1.5">
           <label className="text-xs font-medium text-muted-foreground uppercase tracking-wide">Tax ID</label>

@@ -4,6 +4,7 @@ import { Toaster as Sonner } from "@/components/ui/sonner";
 import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { AuthProvider } from "@/contexts/AuthContext";
+import { DataProvider } from "@/contexts/DataContext";
 import { AppLayout } from "@/components/AppLayout";
 import Dashboard from "./pages/Dashboard";
 import Bookings from "./pages/Bookings";
@@ -15,30 +16,91 @@ import NotFound from "./pages/NotFound";
 import Signup from "./pages/Signup";
 import Login from "./pages/Login";
 import ClientDashboard from "./pages/ClientDashboard";
+import ProjectDetails from "./pages/ProjectDetails";
+import { ProtectedRoute, PublicRoute } from "@/components/RouteGuard";
 
 const queryClient = new QueryClient();
 
 const App = () => (
   <QueryClientProvider client={queryClient}>
     <AuthProvider>
-      <TooltipProvider>
-        <Toaster />
-        <Sonner />
-        <BrowserRouter>
-          <Routes>
-            <Route path="/signup" element={<Signup />} />
-            <Route path="/login" element={<Login />} />
-            <Route path="/client-dashboard" element={<ClientDashboard />} />
-            <Route element={<AppLayout><Dashboard /></AppLayout>} path="/" />
-            <Route element={<AppLayout><Bookings /></AppLayout>} path="/bookings" />
-            <Route element={<AppLayout><Clients /></AppLayout>} path="/clients" />
-            <Route element={<AppLayout><Gallery /></AppLayout>} path="/gallery" />
-            <Route element={<AppLayout><Notifications /></AppLayout>} path="/notifications" />
-            <Route element={<AppLayout><Settings /></AppLayout>} path="/settings" />
-            <Route path="*" element={<NotFound />} />
-          </Routes>
-        </BrowserRouter>
-      </TooltipProvider>
+      <DataProvider>
+        <TooltipProvider>
+          <Toaster />
+          <Sonner />
+          <BrowserRouter>
+            <Routes>
+              <Route path="/signup" element={<PublicRoute><Signup /></PublicRoute>} />
+              <Route path="/login" element={<PublicRoute><Login /></PublicRoute>} />
+              <Route
+                path="/client-dashboard"
+                element={
+                  <ProtectedRoute allowedRoles={["client"]}>
+                    <ClientDashboard />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                element={
+                  <ProtectedRoute>
+                    <AppLayout><Dashboard /></AppLayout>
+                  </ProtectedRoute>
+                }
+                path="/"
+              />
+              <Route
+                element={
+                  <ProtectedRoute>
+                    <AppLayout><Bookings /></AppLayout>
+                  </ProtectedRoute>
+                }
+                path="/bookings"
+              />
+              <Route
+                element={
+                  <ProtectedRoute>
+                    <AppLayout><Clients /></AppLayout>
+                  </ProtectedRoute>
+                }
+                path="/clients"
+              />
+              <Route
+                element={
+                  <ProtectedRoute>
+                    <AppLayout><Gallery /></AppLayout>
+                  </ProtectedRoute>
+                }
+                path="/gallery"
+              />
+              <Route
+                element={
+                  <ProtectedRoute>
+                    <AppLayout><Notifications /></AppLayout>
+                  </ProtectedRoute>
+                }
+                path="/notifications"
+              />
+              <Route
+                element={
+                  <ProtectedRoute>
+                    <AppLayout><Settings /></AppLayout>
+                  </ProtectedRoute>
+                }
+                path="/settings"
+              />
+              <Route
+                element={
+                  <ProtectedRoute>
+                    <AppLayout><ProjectDetails /></AppLayout>
+                  </ProtectedRoute>
+                }
+                path="/projects/:projectId"
+              />
+              <Route path="*" element={<NotFound />} />
+            </Routes>
+          </BrowserRouter>
+        </TooltipProvider>
+      </DataProvider>
     </AuthProvider>
   </QueryClientProvider>
 );

@@ -21,7 +21,16 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
   const navigate = useNavigate();
 
   const unreadCount = quickNotifications.filter((n) => n.unread).length;
-  const { logout } = useAuth();
+  const { logout, user, userRole } = useAuth();
+  const displayName = user?.displayName?.trim() || user?.email?.split("@")[0] || "User";
+  const email = user?.email || "No email";
+  const initials = displayName
+    .split(" ")
+    .filter(Boolean)
+    .slice(0, 2)
+    .map((part) => part[0]?.toUpperCase())
+    .join("") || "U";
+  const roleLabel = userRole === "admin" ? "Administrator" : "Client";
 
   useEffect(() => {
     const handler = (e: MouseEvent) => {
@@ -106,11 +115,11 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
                   className="flex items-center gap-2 rounded-xl px-2 py-1.5 hover:bg-accent/60 transition-colors"
                 >
                   <div className="h-9 w-9 rounded-full bg-gradient-to-br from-primary to-primary/60 flex items-center justify-center text-sm font-bold text-white shadow-md">
-                    A
+                    {initials}
                   </div>
                   <div className="hidden md:block text-left">
-                    <p className="text-sm font-semibold text-foreground leading-tight">Admin</p>
-                    <p className="text-[10px] text-muted-foreground leading-tight">Administrator</p>
+                    <p className="text-sm font-semibold text-foreground leading-tight">{displayName}</p>
+                    <p className="text-[10px] text-muted-foreground leading-tight">{roleLabel}</p>
                   </div>
                   <ChevronDown className="h-3.5 w-3.5 text-muted-foreground hidden md:block" />
                 </button>
@@ -120,12 +129,12 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
                     <div className="px-4 py-4 border-b border-border/30">
                       <div className="flex items-center gap-3">
                         <div className="h-12 w-12 rounded-full bg-gradient-to-br from-primary to-primary/60 flex items-center justify-center text-lg font-bold text-white shadow-md">
-                          A
+                          {initials}
                         </div>
                         <div>
-                          <p className="text-base font-bold text-foreground">Admin</p>
-                          <p className="text-xs text-muted-foreground">admin@studiocrm.com</p>
-                          <span className="inline-block mt-1 text-[10px] font-semibold text-primary bg-primary/10 px-2 py-0.5 rounded-full">Administrator</span>
+                          <p className="text-base font-bold text-foreground">{displayName}</p>
+                          <p className="text-xs text-muted-foreground">{email}</p>
+                          <span className="inline-block mt-1 text-[10px] font-semibold text-primary bg-primary/10 px-2 py-0.5 rounded-full">{roleLabel}</span>
                         </div>
                       </div>
                     </div>
@@ -145,8 +154,8 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
                     </div>
                     <div className="border-t border-border/30 py-1.5">
                       <button
-                        onClick={() => {
-                          logout();
+                        onClick={async () => {
+                          await logout();
                           navigate("/login");
                           setShowProfile(false);
                         }}

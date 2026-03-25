@@ -1,14 +1,7 @@
 import { CalendarDays, Filter, Plus } from "lucide-react";
 import { Button } from "@/components/ui/button";
-
-const bookings = [
-  { id: 1, client: "Mara Jensen", type: "Wedding", date: "Mar 28, 2026", time: "10:00 AM", location: "Riverside Gardens", status: "confirmed", amount: "$2,400" },
-  { id: 2, client: "Leo Tran", type: "Portrait Session", date: "Mar 30, 2026", time: "2:00 PM", location: "Studio A", status: "pending", amount: "$350" },
-  { id: 3, client: "Ava Mitchell", type: "Product Shoot", date: "Apr 2, 2026", time: "9:00 AM", location: "Studio B", status: "confirmed", amount: "$800" },
-  { id: 4, client: "Noah Caldwell", type: "Corporate Event", date: "Apr 5, 2026", time: "6:00 PM", location: "Grand Ballroom", status: "pending", amount: "$1,600" },
-  { id: 5, client: "Iris Nakamura", type: "Family Portrait", date: "Apr 8, 2026", time: "11:00 AM", location: "Maple Park", status: "completed", amount: "$450" },
-  { id: 6, client: "Ravi Patel", type: "Headshots", date: "Apr 10, 2026", time: "3:00 PM", location: "Studio A", status: "confirmed", amount: "$275" },
-];
+import { NewBookingDialog } from "@/components/NewBookingDialog";
+import { useData } from "@/contexts/DataContext";
 
 const statusColors: Record<string, string> = {
   confirmed: "bg-mint-light text-mint",
@@ -17,6 +10,7 @@ const statusColors: Record<string, string> = {
 };
 
 export default function Bookings() {
+  const { bookings } = useData();
   return (
     <div className="space-y-6 max-w-7xl">
       <div className="flex items-center justify-between animate-fade-in-up">
@@ -24,10 +18,7 @@ export default function Bookings() {
           <h1 className="text-2xl font-bold tracking-tight text-foreground" style={{ lineHeight: "1.1" }}>Bookings</h1>
           <p className="mt-1 text-sm text-muted-foreground">Manage your photo sessions and appointments.</p>
         </div>
-        <Button className="gap-2">
-          <Plus className="h-4 w-4" />
-          New Booking
-        </Button>
+        <NewBookingDialog />
       </div>
 
       <div className="flex items-center gap-3 animate-fade-in-up" style={{ animationDelay: "80ms" }}>

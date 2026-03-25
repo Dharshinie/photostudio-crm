@@ -8,46 +8,45 @@ import { Eye, EyeOff, Mail, Lock } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 
 const Login = () => {
+  const navigate = useNavigate();
   const [formData, setFormData] = useState({
     email: "",
     password: "",
   });
   const [showPassword, setShowPassword] = useState(false);
-  const navigate = useNavigate();
   const { login } = useAuth();
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    // Mock login
-    const role = formData.email.includes("admin") ? "admin" : "client";
-    login(formData.email, formData.password);
-    // Redirect based on role
-    if (role === "admin") {
-      navigate("/");
-    } else {
-      navigate("/client-dashboard");
+    try {
+      const role = await login(formData.email, formData.password);
+      navigate(role === "admin" ? "/" : "/client-dashboard");
+    } catch (error: unknown) {
+      const message = error instanceof Error ? error.message : 'Login failed';
+      alert(`Login failed: ${message}`);
     }
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-sky-light via-white to-mint-light flex items-center justify-center px-4 py-8">
-      <Card className="glass w-full max-w-md rounded-[2rem] border border-white/70 shadow-2xl">
+    <div className="auth-scene flex min-h-screen items-center justify-center px-4 py-8">
+      <div className="relative z-10 w-full max-w-md">
+      <Card className="w-full rounded-[2rem] border border-violet-300/35 bg-violet-950/20 shadow-[0_24px_80px_-24px_rgba(7,2,28,0.8)] backdrop-blur-2xl">
         <CardHeader className="space-y-2 text-center">
-          <CardTitle className="text-3xl font-extrabold tracking-tight text-slate-800">Welcome Back</CardTitle>
-          <CardDescription className="text-base text-slate-500">
+          <CardTitle className="text-3xl font-extrabold tracking-tight text-white">Welcome Back</CardTitle>
+          <CardDescription className="text-base text-violet-100/70">
             Sign in to your Bloom Studio account
           </CardDescription>
         </CardHeader>
         <CardContent>
           <form onSubmit={handleSubmit} className="space-y-4">
             <div className="space-y-2">
-              <Label htmlFor="email" className="text-sm font-semibold text-slate-700">Email</Label>
+              <Label htmlFor="email" className="text-sm font-semibold text-violet-50">Email</Label>
               <div className="relative">
-                <Mail className="absolute left-3 top-3 h-4 w-4 text-slate-400" />
+                <Mail className="absolute left-3 top-4 h-4 w-4 text-grey-100/65" />
                 <Input
                   id="email"
                   name="email"
@@ -55,15 +54,15 @@ const Login = () => {
                   placeholder="Enter your email"
                   value={formData.email}
                   onChange={handleChange}
-                  className="h-12 rounded-2xl border-slate-200 bg-white/85 pl-10 text-slate-800 placeholder:text-slate-400 focus-visible:ring-2 focus-visible:ring-primary/40 focus-visible:ring-offset-0"
+                  className="h-12 rounded-full border border-violet-200/20 bg-white/12 pl-10 text-grey placeholder:text-grey-100/45 focus-visible:ring-2 focus-visible:ring-violet-300/45 focus-visible:ring-offset-0"
                   required
                 />
               </div>
             </div>
             <div className="space-y-2">
-              <Label htmlFor="password" className="text-sm font-semibold text-slate-700">Password</Label>
+              <Label htmlFor="password" className="text-sm font-semibold text-violet-50">Password</Label>
               <div className="relative">
-                <Lock className="absolute left-3 top-3 h-4 w-4 text-slate-400" />
+                <Lock className="absolute left-3 top-4 h-4 w-4 text-grey-100/65" />
                 <Input
                   id="password"
                   name="password"
@@ -71,13 +70,13 @@ const Login = () => {
                   placeholder="Enter your password"
                   value={formData.password}
                   onChange={handleChange}
-                  className="h-12 rounded-2xl border-slate-200 bg-white/85 pl-10 pr-10 text-slate-800 placeholder:text-slate-400 focus-visible:ring-2 focus-visible:ring-primary/40 focus-visible:ring-offset-0"
+                  className="h-12 rounded-full border border-violet-200/20 bg-white/12 pl-10 pr-10 text-grey placeholder:text-grey-100/45 focus-visible:ring-2 focus-visible:ring-violet-300/45 focus-visible:ring-offset-0"
                   required
                 />
                 <button
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
-                  className="absolute right-3 top-3 text-slate-400 transition-colors hover:text-slate-600"
+                  className="absolute right-3 top-4 text-grey-100/65 transition-colors hover:text-white"
                 >
                   {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
                 </button>
@@ -85,21 +84,22 @@ const Login = () => {
             </div>
             <Button
               type="submit"
-              className="h-12 w-full rounded-2xl bg-gradient-to-r from-indigo-600 via-violet-600 to-sky-500 font-semibold text-white shadow-lg shadow-indigo-500/25 transition-transform hover:-translate-y-0.5 hover:opacity-95"
+              className="h-12 w-full rounded-full bg-white text-violet-900 shadow-lg shadow-black/25 transition-transform hover:-translate-y-0.5 hover:bg-violet-50"
             >
               Sign In
             </Button>
           </form>
           <div className="mt-6 text-center">
-            <p className="text-slate-500">
+            <p className="text-violet-100/75">
               Don't have an account?{" "}
-              <Link to="/signup" className="font-semibold text-indigo-600 hover:text-indigo-500 hover:underline">
+              <Link to="/signup" className="font-semibold text-white hover:text-violet-100 hover:underline">
                 Sign up
               </Link>
             </p>
           </div>
         </CardContent>
       </Card>
+      </div>
     </div>
   );
 };

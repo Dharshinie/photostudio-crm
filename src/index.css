@@ -125,4 +125,57 @@
     backdrop-filter: blur(var(--glass-blur));
     -webkit-backdrop-filter: blur(var(--glass-blur));
   }
+
+  .auth-scene {
+    position: relative;
+    overflow: hidden;
+    background:
+      radial-gradient(circle at 15% 20%, rgba(255, 255, 255, 0.28) 0 1px, transparent 1.5px),
+      radial-gradient(circle at 30% 35%, rgba(255, 255, 255, 0.32) 0 1.2px, transparent 1.7px),
+      radial-gradient(circle at 48% 18%, rgba(255, 255, 255, 0.26) 0 1px, transparent 1.4px),
+      radial-gradient(circle at 63% 28%, rgba(255, 255, 255, 0.3) 0 1.2px, transparent 1.7px),
+      radial-gradient(circle at 78% 16%, rgba(255, 255, 255, 0.28) 0 1px, transparent 1.5px),
+      radial-gradient(circle at 88% 34%, rgba(255, 255, 255, 0.22) 0 1px, transparent 1.4px),
+      radial-gradient(circle at top, rgba(214, 168, 255, 0.28), transparent 36%),
+      linear-gradient(180deg, #6d23d7 0%, #5a1ec0 32%, #43108e 62%, #2a0757 100%);
+    background-size:
+      180px 180px,
+      220px 220px,
+      200px 200px,
+      240px 240px,
+      210px 210px,
+      230px 230px,
+      auto,
+      auto;
+  }
+
+  .auth-scene::before {
+    content: "";
+    position: absolute;
+    inset: auto 0 0 0;
+    height: 46%;
+    background: linear-gradient(180deg, transparent, rgba(25, 5, 54, 0.16));
+    clip-path: polygon(0 58%, 11% 44%, 20% 54%, 34% 32%, 47% 49%, 58% 29%, 70% 46%, 82% 27%, 100% 55%, 100% 100%, 0 100%);
+    background-color: rgba(129, 87, 222, 0.5);
+    opacity: 0.95;
+  }
+
+  .auth-scene::after {
+    content: "";
+    position: absolute;
+    inset: auto 0 0 0;
+    height: 34%;
+    background:
+      radial-gradient(circle at 6% 100%, rgba(41, 8, 90, 0.96) 0 55px, transparent 56px),
+      radial-gradient(circle at 14% 100%, rgba(41, 8, 90, 0.96) 0 78px, transparent 79px),
+      radial-gradient(circle at 23% 100%, rgba(41, 8, 90, 0.98) 0 60px, transparent 61px),
+      radial-gradient(circle at 34% 100%, rgba(41, 8, 90, 0.98) 0 88px, transparent 89px),
+      radial-gradient(circle at 46% 100%, rgba(41, 8, 90, 0.98) 0 66px, transparent 67px),
+      radial-gradient(circle at 58% 100%, rgba(41, 8, 90, 0.98) 0 92px, transparent 93px),
+      radial-gradient(circle at 70% 100%, rgba(41, 8, 90, 0.98) 0 64px, transparent 65px),
+      radial-gradient(circle at 82% 100%, rgba(41, 8, 90, 0.98) 0 84px, transparent 85px),
+      radial-gradient(circle at 94% 100%, rgba(41, 8, 90, 0.98) 0 58px, transparent 59px),
+      linear-gradient(180deg, rgba(69, 18, 140, 0.28), rgba(34, 4, 76, 0.98));
+    pointer-events: none;
+  }
 }
