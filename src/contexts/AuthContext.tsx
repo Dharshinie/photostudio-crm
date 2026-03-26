@@ -86,11 +86,11 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       );
 
       if (!userDoc) {
-        return cachedRole || "admin";
+        return cachedRole || "client";
       }
 
       if (userDoc.exists()) {
-        const role = (userDoc.val()?.role as string) || "admin";
+        const role = (userDoc.val()?.role as string) || "client";
         cacheUserRole(firebaseUser.uid, role);
         return role;
       }
@@ -98,7 +98,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       console.error("Error fetching user role:", error);
     }
 
-    return cachedRole || "admin";
+    return cachedRole || "client";
   };
 
   useEffect(() => {
@@ -106,7 +106,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       if (firebaseUser) {
         setUser(firebaseUser);
         const cachedRole = getCachedUserRole(firebaseUser.uid);
-        setUserRole(cachedRole || "admin");
+        setUserRole(cachedRole || "client");
         setLoading(false);
 
         void resolveUserRole(firebaseUser).then((role) => {

@@ -42,7 +42,7 @@ const App = () => (
               />
               <Route
                 element={
-                  <ProtectedRoute>
+                  <ProtectedRoute allowedRoles={["admin"]}>
                     <AppLayout><Dashboard /></AppLayout>
                   </ProtectedRoute>
                 }
@@ -50,7 +50,7 @@ const App = () => (
               />
               <Route
                 element={
-                  <ProtectedRoute>
+                  <ProtectedRoute allowedRoles={["admin"]}>
                     <AppLayout><Bookings /></AppLayout>
                   </ProtectedRoute>
                 }
@@ -58,7 +58,7 @@ const App = () => (
               />
               <Route
                 element={
-                  <ProtectedRoute>
+                  <ProtectedRoute allowedRoles={["admin"]}>
                     <AppLayout><Clients /></AppLayout>
                   </ProtectedRoute>
                 }
@@ -66,7 +66,7 @@ const App = () => (
               />
               <Route
                 element={
-                  <ProtectedRoute>
+                  <ProtectedRoute allowedRoles={["admin"]}>
                     <AppLayout><Gallery /></AppLayout>
                   </ProtectedRoute>
                 }
@@ -74,7 +74,7 @@ const App = () => (
               />
               <Route
                 element={
-                  <ProtectedRoute>
+                  <ProtectedRoute allowedRoles={["admin"]}>
                     <AppLayout><Notifications /></AppLayout>
                   </ProtectedRoute>
                 }
@@ -82,7 +82,7 @@ const App = () => (
               />
               <Route
                 element={
-                  <ProtectedRoute>
+                  <ProtectedRoute allowedRoles={["admin"]}>
                     <AppLayout><Settings /></AppLayout>
                   </ProtectedRoute>
                 }
@@ -90,7 +90,7 @@ const App = () => (
               />
               <Route
                 element={
-                  <ProtectedRoute>
+                  <ProtectedRoute allowedRoles={["admin"]}>
                     <AppLayout><ProjectDetails /></AppLayout>
                   </ProtectedRoute>
                 }

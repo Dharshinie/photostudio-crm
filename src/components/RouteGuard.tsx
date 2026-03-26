@@ -28,7 +28,7 @@ export function ProtectedRoute({
     return <Navigate to="/login" replace />;
   }
 
-  if (allowedRoles && userRole && !allowedRoles.includes(userRole)) {
+  if (allowedRoles && (!userRole || !allowedRoles.includes(userRole))) {
     return <Navigate to={getDashboardPath(userRole)} replace />;
   }
 

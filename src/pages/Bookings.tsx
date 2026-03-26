@@ -1,4 +1,5 @@
-import { CalendarDays, Filter, Plus } from "lucide-react";
+import { CalendarDays, Filter } from "lucide-react";
+import { useMemo, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { NewBookingDialog } from "@/components/NewBookingDialog";
 import { useData } from "@/contexts/DataContext";
@@ -9,8 +10,21 @@ const statusColors: Record<string, string> = {
   completed: "bg-lavender-light text-lavender",
 };
 
+const filterTabs = ["All", "Pending", "Confirmed", "Completed"] as const;
+type BookingFilter = (typeof filterTabs)[number];
+
 export default function Bookings() {
   const { bookings } = useData();
+  const [activeFilter, setActiveFilter] = useState<BookingFilter>("All");
+
+  const filteredBookings = useMemo(() => {
+    if (activeFilter === "All") {
+      return bookings;
+    }
+
+    return bookings.filter((booking) => booking.status === activeFilter.toLowerCase());
+  }, [activeFilter, bookings]);
+
   return (
     <div className="space-y-6 max-w-7xl">
       <div className="flex items-center justify-between animate-fade-in-up">
@@ -25,14 +39,15 @@ export default function Bookings() {
         <Button variant="outline" size="sm" className="gap-2 text-xs">
           <Filter className="h-3.5 w-3.5" /> Filter
         </Button>
-        {["All", "Pending", "Confirmed", "Completed"].map((f) => (
+        {filterTabs.map((filterLabel) => (
           <button
-            key={f}
+            key={filterLabel}
+            onClick={() => setActiveFilter(filterLabel)}
             className={`text-xs font-medium px-3 py-1.5 rounded-full transition-colors ${
-              f === "All" ? "bg-primary text-primary-foreground" : "bg-muted text-muted-foreground hover:bg-accent"
+              activeFilter === filterLabel ? "bg-primary text-primary-foreground" : "bg-muted text-muted-foreground hover:bg-accent"
             }`}
           >
-            {f}
+            {filterLabel}
           </button>
         ))}
       </div>
@@ -50,7 +65,7 @@ export default function Bookings() {
             </tr>
           </thead>
           <tbody>
-            {bookings.map((b) => (
+            {filteredBookings.map((b) => (
               <tr key={b.id} className="border-b border-border/30 last:border-0 hover:bg-muted/30 transition-colors">
                 <td className="py-3.5 px-4">
                   <div className="flex items-center gap-3">
@@ -76,6 +91,13 @@ export default function Bookings() {
                 </td>
               </tr>
             ))}
+            {!filteredBookings.length && (
+              <tr>
+                <td colSpan={6} className="px-4 py-10 text-center text-sm text-muted-foreground">
+                  No {activeFilter.toLowerCase()} bookings found.
+                </td>
+              </tr>
+            )}
           </tbody>
         </table>
       </div>

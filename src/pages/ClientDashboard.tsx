@@ -11,6 +11,7 @@ import {
   CreditCard,
   Download,
   Image,
+  LogOut,
   MapPin,
   ShieldCheck,
   Sparkles,
@@ -26,6 +27,7 @@ import {
 import { useData } from "@/contexts/DataContext";
 import { useAuth } from "@/contexts/AuthContext";
 import { Input } from "@/components/ui/input";
+import { useNavigate } from "react-router-dom";
 
 const statusColorMap: Record<string, string> = {
   completed: "text-emerald-600",
@@ -50,8 +52,9 @@ const ClientDashboard = () => {
   const [passcode, setPasscode] = useState("");
   const [albumError, setAlbumError] = useState("");
   const [unlockedAlbumId, setUnlockedAlbumId] = useState<string | null>(null);
+  const navigate = useNavigate();
   const { bookings, projects, albums, unlockAlbumByPasscode, toggleAlbumPhotoSelection } = useData();
-  const { user } = useAuth();
+  const { user, logout } = useAuth();
 
   const activeBooking = bookings[0] || null;
   const unlockedAlbum = useMemo(() => {
@@ -156,6 +159,11 @@ const ClientDashboard = () => {
     setShowGalleryDetails(true);
   };
 
+  const handleLogout = async () => {
+    await logout();
+    navigate("/login");
+  };
+
   if (!activeBooking && !activeProject && !unlockedAlbum) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-sky-light via-white to-mint-light px-4 py-6 md:px-8">
@@ -170,6 +178,12 @@ const ClientDashboard = () => {
             <CardContent className="space-y-4">
               <div className="rounded-[1.5rem] border border-dashed border-slate-300 bg-white/70 p-6 text-sm leading-7 text-slate-600">
                 Signed in as {clientName}. No bookings or project records were found yet for this account.
+              </div>
+              <div className="flex justify-end">
+                <Button variant="outline" onClick={handleLogout} className="gap-2">
+                  <LogOut className="h-4 w-4" />
+                  Logout
+                </Button>
               </div>
               <div className="flex flex-col gap-3 sm:flex-row">
                 <Input value={passcode} onChange={(e) => setPasscode(e.target.value.toUpperCase())} placeholder="Enter album passcode" />
@@ -190,9 +204,15 @@ const ClientDashboard = () => {
           <section className="glass overflow-hidden rounded-[2rem] border border-white/70 px-6 py-8 shadow-2xl md:px-10">
             <div className="grid gap-8 lg:grid-cols-[1.4fr_0.9fr] lg:items-center">
               <div className="space-y-5">
-                <Badge className="w-fit border-0 bg-indigo-100 px-4 py-1 text-indigo-700 hover:bg-indigo-100">
-                  Client Dashboard
-                </Badge>
+                <div className="flex flex-wrap items-center justify-between gap-3">
+                  <Badge className="w-fit border-0 bg-indigo-100 px-4 py-1 text-indigo-700 hover:bg-indigo-100">
+                    Client Dashboard
+                  </Badge>
+                  <Button variant="outline" onClick={handleLogout} className="gap-2 rounded-full border-white/70 bg-white/75 px-5 text-slate-700 hover:bg-white">
+                    <LogOut className="h-4 w-4" />
+                    Logout
+                  </Button>
+                </div>
                 <div className="space-y-3">
                   <h1 className="max-w-2xl text-4xl font-extrabold tracking-tight text-slate-800 md:text-5xl">
                     Welcome, {clientName}
