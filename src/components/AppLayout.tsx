@@ -51,7 +51,7 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
               <SidebarTrigger className="-ml-1" />
               <div className="hidden sm:flex items-center gap-2 rounded-xl bg-white/40 backdrop-blur-sm border border-white/50 px-3 py-2 text-sm text-muted-foreground">
                 <Search className="h-4 w-4" />
-                <span>Search…</span>
+                <span>Searchâ€¦</span>
               </div>
             </div>
             <div className="flex items-center gap-2">
@@ -112,7 +112,7 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
               <div className="relative z-[95]" ref={profileRef}>
                 <button
                   onClick={() => { setShowProfile(!showProfile); setShowNotifications(false); }}
-                  className="flex items-center gap-2 rounded-xl px-2 py-1.5 hover:bg-accent/60 transition-colors"
+                  className="flex items-center gap-2 rounded-xl bg-white px-2 py-1.5 transition-colors hover:bg-white"
                 >
                   <div className="h-9 w-9 rounded-full bg-gradient-to-br from-primary to-primary/60 flex items-center justify-center text-sm font-bold text-white shadow-md">
                     {initials}
@@ -125,8 +125,8 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
                 </button>
 
                 {showProfile && (
-                  <div className="absolute right-0 top-14 z-[120] w-72 rounded-2xl border border-white/40 p-2 shadow-xl glass animate-fade-in-up">
-                    <div className="px-4 py-4 border-b border-border/30">
+                  <div className="absolute right-0 top-14 z-[120] w-72 rounded-2xl bg-white p-2 animate-fade-in-up">
+                    <div className="px-4 py-4 border-b border-slate-200/80">
                       <div className="flex items-center gap-3">
                         <div className="h-12 w-12 rounded-full bg-gradient-to-br from-primary to-primary/60 flex items-center justify-center text-lg font-bold text-white shadow-md">
                           {initials}
@@ -141,25 +141,25 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
                     <div className="py-1.5">
                       <button
                         onClick={() => { navigate("/settings"); setShowProfile(false); }}
-                        className="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium text-foreground hover:bg-accent/60 transition-colors"
+                        className="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium text-foreground hover:bg-slate-100 transition-colors"
                       >
                         <User className="h-4 w-4 text-muted-foreground" /> My Profile
                       </button>
                       <button
                         onClick={() => { navigate("/settings"); setShowProfile(false); }}
-                        className="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium text-foreground hover:bg-accent/60 transition-colors"
+                        className="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium text-foreground hover:bg-slate-100 transition-colors"
                       >
                         <Settings className="h-4 w-4 text-muted-foreground" /> Settings
                       </button>
                     </div>
-                    <div className="border-t border-border/30 py-1.5">
+                    <div className="border-t border-slate-200/80 py-1.5">
                       <button
                         onClick={async () => {
                           await logout();
                           navigate("/login");
                           setShowProfile(false);
                         }}
-                        className="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium text-destructive hover:bg-destructive/10 transition-colors"
+                        className="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium text-destructive hover:bg-rose-50 transition-colors"
                       >
                         <LogOut className="h-4 w-4" /> Sign Out
                       </button>
@@ -175,3 +175,4 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
     </SidebarProvider>
   );
 }
+

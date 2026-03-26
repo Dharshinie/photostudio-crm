@@ -47,6 +47,12 @@ const statusIconMap: Record<string, ReactNode> = {
   upcoming: <XCircle className="h-5 w-5 text-orange-500" />,
 };
 
+const getPhotoCardStyle = (url: string) => (
+  url.startsWith("data:image")
+    ? { backgroundImage: `url(${url})`, backgroundSize: "cover", backgroundPosition: "center" }
+    : { backgroundColor: url }
+);
+
 const ClientDashboard = () => {
   const [showGalleryDetails, setShowGalleryDetails] = useState(false);
   const [passcode, setPasscode] = useState("");
@@ -439,7 +445,7 @@ const ClientDashboard = () => {
               </DialogHeader>
 
               {unlockedAlbum ? (
-                <div className="mt-6 grid gap-4 sm:grid-cols-2">
+                <div className="mt-6 grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
                   {unlockedAlbum.photos.map((photo) => (
                     <button
                       key={photo.id}
@@ -454,12 +460,16 @@ const ClientDashboard = () => {
                           : "border-white/70 bg-white/80 hover:border-indigo-200"
                       }`}
                     >
-                      <div className="flex h-32 items-end justify-between rounded-[1rem] border border-white/60 bg-white/50 p-4" style={{ backgroundColor: photo.url }}>
-                        <p className="text-sm font-semibold text-slate-700">{photo.label}</p>
-                        <p className="rounded-full bg-white/85 px-2 py-1 text-xs font-bold text-slate-800">
+                      <div
+                        className="flex h-44 items-end justify-between rounded-[1rem] border border-white/60 bg-white/50 p-4"
+                        style={getPhotoCardStyle(photo.url)}
+                      >
+                        {!photo.url.startsWith("data:image") ? <p className="text-sm font-semibold text-slate-700">{photo.label}</p> : <span />}
+                        <p className="rounded-full bg-white/85 px-2 py-1 text-xs font-bold text-slate-800 shadow-sm">
                           {photo.selected ? "Selected" : "Tap to select"}
                         </p>
                       </div>
+                      <p className="mt-3 truncate text-sm font-semibold text-slate-700">{photo.label}</p>
                     </button>
                   ))}
                 </div>

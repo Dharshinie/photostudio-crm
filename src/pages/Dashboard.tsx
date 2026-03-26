@@ -169,19 +169,19 @@ export default function Dashboard() {
           </div>
         </section>
 
-        <section className="grid gap-5 sm:grid-cols-2 xl:grid-cols-5">
+        <section className="grid auto-rows-fr gap-5 sm:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-5">
           {stats.map((item) => (
             <div
               key={item.label}
-              className={`overflow-hidden rounded-[1.6rem] border border-white/70 bg-gradient-to-br ${item.accent} p-5 shadow-lg shadow-slate-200/50`}
+              className={`flex h-full min-h-[230px] flex-col items-start overflow-hidden rounded-[1.8rem] border border-white/70 bg-gradient-to-br ${item.accent} p-6 shadow-lg shadow-slate-200/50`}
             >
-              <div className="flex items-start justify-between gap-4">
-                <div>
+              <div className="flex h-full w-full flex-col items-start">
+                <div className="space-y-3">
                   <p className="text-xs font-semibold uppercase tracking-[0.2em] text-slate-500">{item.label}</p>
-                  <p className="mt-3 text-3xl font-bold tracking-tight text-slate-800">{item.value}</p>
-                  <p className="mt-2 text-sm text-slate-500">{item.meta}</p>
+                  <p className="text-3xl font-bold tracking-tight text-slate-800 sm:text-[2.1rem]">{item.value}</p>
+                  <p className="max-w-[16rem] text-sm leading-7 text-slate-500">{item.meta}</p>
                 </div>
-                <div className={`flex h-12 w-12 items-center justify-center rounded-2xl text-white shadow-md ${item.iconWrap}`}>
+                <div className={`mt-auto flex h-14 w-14 shrink-0 items-center justify-center rounded-[1.35rem] text-white shadow-md ${item.iconWrap}`}>
                   <item.icon className="h-5 w-5" />
                 </div>
               </div>
@@ -295,7 +295,7 @@ export default function Dashboard() {
             <div className="space-y-4">
               {pendingProjects.map((project) => (
                 <div key={project.id} className="rounded-[1.4rem] border border-slate-200/80 bg-white/80 p-4 shadow-sm">
-                  <div className="flex items-start justify-between gap-4">
+                  <div className="flex h-full flex-col justify-between gap-6">
                     <div>
                       <p className="text-sm font-semibold text-slate-800">{project.clientName}</p>
                       <p className="mt-1 text-sm text-slate-500">{project.projectName}</p>

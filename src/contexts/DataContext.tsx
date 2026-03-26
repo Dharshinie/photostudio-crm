@@ -65,6 +65,11 @@ export interface AlbumPhoto {
   selected: boolean;
 }
 
+export interface CreateAlbumPhotoInput {
+  url: string;
+  label: string;
+}
+
 export interface Album {
   recordId?: string;
   albumId: string;
@@ -89,7 +94,20 @@ interface DataContextType {
   addClient: (client: Omit<Client, "recordId">) => Promise<void>;
   updateClient: (clientName: string, updates: Partial<Client>) => Promise<void>;
   updateProjectStatus: (projectId: number, status: ProjectStatus) => Promise<void>;
-  createAlbum: (input: { title: string; clientName: string; photoCount: number; projectId?: number }) => Promise<{ albumId: string; passcode: string }>;
+  createAlbum: (input: {
+    title: string;
+    clientName: string;
+    photoCount?: number;
+    projectId?: number;
+    photos?: CreateAlbumPhotoInput[];
+  }) => Promise<{ albumId: string; passcode: string }>;
+  updateAlbum: (albumRecordId: string, input: {
+    title?: string;
+    clientName?: string;
+    projectId?: number;
+    photos?: CreateAlbumPhotoInput[];
+    status?: Album["status"];
+  }) => Promise<void>;
   unlockAlbumByPasscode: (passcode: string) => Album | null;
   toggleAlbumPhotoSelection: (albumRecordId: string, photoId: string) => Promise<void>;
   startAlbumEditing: (albumRecordId: string) => Promise<void>;
@@ -326,6 +344,38 @@ function normalizeAlbum(album: Partial<Album> & { recordId?: string }): Album {
     createdAt: album.createdAt,
     updatedAt: album.updatedAt,
   };
+}
+
+function buildAlbumPhotos({
+  title,
+  photoCount,
+  uploadedPhotos = [],
+}: {
+  title: string;
+  photoCount?: number;
+  uploadedPhotos?: CreateAlbumPhotoInput[];
+}) {
+  const tones = [
+    "hsl(262, 52%, 88%)",
+    "hsl(210, 70%, 88%)",
+    "hsl(162, 48%, 85%)",
+    "hsl(18, 85%, 88%)",
+    "hsl(210, 60%, 90%)",
+  ];
+
+  return uploadedPhotos.length
+    ? uploadedPhotos.map((photo, index) => ({
+        id: `photo-${index + 1}`,
+        url: photo.url,
+        label: photo.label || `${title} ${String(index + 1).padStart(2, "0")}`,
+        selected: false,
+      }))
+    : Array.from({ length: Math.max(1, photoCount || 0) }, (_, index) => ({
+        id: `photo-${index + 1}`,
+        url: tones[index % tones.length],
+        label: `${title} ${String(index + 1).padStart(2, "0")}`,
+        selected: false,
+      }));
 }
 
 async function seedSharedStudioData() {
@@ -591,30 +641,19 @@ export const DataProvider = ({ children }: { children: ReactNode }) => {
     clientName,
     photoCount,
     projectId,
+    photos: uploadedPhotos = [],
   }: {
     title: string;
     clientName: string;
-    photoCount: number;
+    photoCount?: number;
     projectId?: number;
+    photos?: CreateAlbumPhotoInput[];
   }) => {
     const now = new Date().toISOString();
     const albumNumber = albums.length + 1001;
     const albumId = `ALB-${albumNumber}`;
     const passcode = `${clientName.split(" ")[0].toUpperCase().replace(/[^A-Z]/g, "").slice(0, 4)}${String(albumNumber).slice(-2)}`;
-    const tones = [
-      "hsl(262, 52%, 88%)",
-      "hsl(210, 70%, 88%)",
-      "hsl(162, 48%, 85%)",
-      "hsl(18, 85%, 88%)",
-      "hsl(210, 60%, 90%)",
-    ];
-
-    const photos: AlbumPhoto[] = Array.from({ length: Math.max(1, photoCount) }, (_, index) => ({
-      id: `photo-${index + 1}`,
-      url: tones[index % tones.length],
-      label: `${title} ${String(index + 1).padStart(2, "0")}`,
-      selected: false,
-    }));
+    const photos: AlbumPhoto[] = buildAlbumPhotos({ title, photoCount, uploadedPhotos });
 
     const newAlbumRef = push(ref(rtdb, `${DATA_ROOT}/albums`));
     await set(newAlbumRef, {
@@ -623,7 +662,7 @@ export const DataProvider = ({ children }: { children: ReactNode }) => {
       clientName,
       projectId: projectId || null,
       passcode,
-      cover: tones[0],
+      cover: photos[0]?.url || "hsl(262, 52%, 88%)",
       status: "uploaded",
       selectedPhotoIds: [],
       photos,
@@ -632,6 +671,45 @@ export const DataProvider = ({ children }: { children: ReactNode }) => {
     });
 
     return { albumId, passcode };
+  };
+
+  const updateAlbum = async (
+    albumRecordId: string,
+    {
+      title,
+      clientName,
+      projectId,
+      photos: uploadedPhotos,
+      status,
+    }: {
+      title?: string;
+      clientName?: string;
+      projectId?: number;
+      photos?: CreateAlbumPhotoInput[];
+      status?: Album["status"];
+    },
+  ) => {
+    const album = albums.find((item) => item.recordId === albumRecordId);
+    if (!album) {
+      return;
+    }
+
+    const nextTitle = title?.trim() || album.title;
+    const nextClientName = clientName?.trim() || album.clientName;
+    const nextPhotos = uploadedPhotos?.length
+      ? buildAlbumPhotos({ title: nextTitle, uploadedPhotos })
+      : album.photos;
+
+    await update(ref(rtdb, `${DATA_ROOT}/albums/${albumRecordId}`), {
+      title: nextTitle,
+      clientName: nextClientName,
+      projectId: projectId || null,
+      cover: nextPhotos[0]?.url || album.cover,
+      photos: nextPhotos,
+      selectedPhotoIds: uploadedPhotos?.length ? [] : album.selectedPhotoIds,
+      status: status || (uploadedPhotos?.length ? "editing" : album.status),
+      updatedAt: new Date().toISOString(),
+    });
   };
 
   const unlockAlbumByPasscode = (passcode: string) => {
@@ -687,6 +765,7 @@ export const DataProvider = ({ children }: { children: ReactNode }) => {
         updateClient,
         updateProjectStatus,
         createAlbum,
+        updateAlbum,
         unlockAlbumByPasscode,
         toggleAlbumPhotoSelection,
         startAlbumEditing,
