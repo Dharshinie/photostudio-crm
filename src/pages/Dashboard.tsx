@@ -122,7 +122,7 @@ export default function Dashboard() {
       meta: "High-retention client relationships",
       icon: Users,
       accent: "from-sky-100 via-white to-sky-50",
-      iconWrap: "bg-sky-600",
+      iconWrap: "bg-slate-900",
     },
     {
       label: "Pending Deliveries",
@@ -144,10 +144,10 @@ export default function Dashboard() {
 
   return (
     <>
-      <div className="mx-auto max-w-7xl space-y-8">
+      <div className="mx-auto max-w-7xl space-y-4">
         <section className="glass overflow-hidden rounded-[2rem] border border-white/70 px-6 py-7 shadow-xl">
-          <div className="grid gap-8 xl:grid-cols-[1.5fr_1fr] xl:items-center">
-            <div className="space-y-4">
+          <div className="grid gap-6 xl:grid-cols-[1.5fr_1fr] xl:items-center">
+            <div className="space-y-3">
               <Badge className="w-fit border-0 bg-violet-100 px-4 py-1 text-violet-700 hover:bg-violet-100">
                 Studio Analytics
               </Badge>
@@ -161,7 +161,7 @@ export default function Dashboard() {
               </div>
             </div>
 
-            <div className="grid gap-4 sm:grid-cols-3 xl:grid-cols-1">
+            <div className="grid gap-3 sm:grid-cols-3 xl:grid-cols-1">
               <HeroMetric label="Projects in Queue" value={`${pendingProjects.length}`} helper="Open production tasks" />
               <HeroMetric label="Delivered This Cycle" value={`${projects.filter((project) => project.status === "delivered").length}`} helper="Completed and shared" />
               <HeroMetric label="Avg Completion" value={`${averageCompletion}%`} helper="Across active projects" />
@@ -169,11 +169,11 @@ export default function Dashboard() {
           </div>
         </section>
 
-        <section className="grid auto-rows-fr gap-5 sm:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-5">
+        <section className="grid auto-rows-fr gap-4 sm:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-5">
           {stats.map((item) => (
             <div
               key={item.label}
-              className={`flex h-full min-h-[230px] flex-col items-start overflow-hidden rounded-[1.8rem] border border-white/70 bg-gradient-to-br ${item.accent} p-6 shadow-lg shadow-slate-200/50`}
+              className={`flex h-full min-h-[210px] flex-col items-start overflow-hidden rounded-[1.8rem] border border-white/70 bg-gradient-to-br ${item.accent} p-5 shadow-lg shadow-slate-200/50`}
             >
               <div className="flex h-full w-full flex-col items-start">
                 <div className="space-y-3">
@@ -189,187 +189,189 @@ export default function Dashboard() {
           ))}
         </section>
 
-        <section className="grid gap-6 xl:grid-cols-[1.75fr_1fr]">
-          <div className="card-soft rounded-[1.75rem] p-6 shadow-xl">
-            <div className="mb-6 flex items-center justify-between">
-              <div>
-                <h2 className="text-lg font-bold text-slate-800">Revenue Overview</h2>
-                <p className="mt-1 text-sm text-slate-500">Monthly studio revenue performance.</p>
-              </div>
-              <Badge className="border-0 bg-emerald-100 text-emerald-700 hover:bg-emerald-100">
-                +18.2%
-              </Badge>
-            </div>
-            <ResponsiveContainer width="100%" height={300}>
-              <BarChart data={revenueData} barCategoryGap={18}>
-                <XAxis dataKey="month" axisLine={false} tickLine={false} tick={{ fontSize: 12, fill: "#64748b" }} />
-                <YAxis axisLine={false} tickLine={false} tick={{ fontSize: 12, fill: "#64748b" }} tickFormatter={(value) => `Rs.${value / 1000}k`} />
-                <Tooltip
-                  cursor={{ fill: "rgba(99, 102, 241, 0.06)" }}
-                  contentStyle={{
-                    borderRadius: "18px",
-                    border: "1px solid rgba(226, 232, 240, 1)",
-                    boxShadow: "0 20px 45px -20px rgba(15, 23, 42, 0.25)",
-                  }}
-                  formatter={(value: number) => [`Rs.${value.toLocaleString()}`, "Revenue"]}
-                />
-                <Bar dataKey="revenue" radius={[12, 12, 0, 0]} fill="url(#revenueGradient)" />
-                <defs>
-                  <linearGradient id="revenueGradient" x1="0" x2="0" y1="0" y2="1">
-                    <stop offset="0%" stopColor="#7c3aed" />
-                    <stop offset="100%" stopColor="#38bdf8" />
-                  </linearGradient>
-                </defs>
-              </BarChart>
-            </ResponsiveContainer>
-          </div>
-
-          <div className="card-soft rounded-[1.75rem] p-6 shadow-xl">
-            <div className="mb-6">
-              <h2 className="text-lg font-bold text-slate-800">Delivery Pipeline</h2>
-              <p className="mt-1 text-sm text-slate-500">Current project status distribution.</p>
-            </div>
-            <ResponsiveContainer width="100%" height={260}>
-              <PieChart>
-                <Pie data={deliveryBreakdown} dataKey="value" nameKey="name" innerRadius={70} outerRadius={96} stroke="none" paddingAngle={4}>
-                  {deliveryBreakdown.map((entry) => (
-                    <Cell key={entry.name} fill={entry.color} />
-                  ))}
-                </Pie>
-                <Tooltip
-                  contentStyle={{
-                    borderRadius: "18px",
-                    border: "1px solid rgba(226, 232, 240, 1)",
-                    boxShadow: "0 20px 45px -20px rgba(15, 23, 42, 0.25)",
-                  }}
-                  formatter={(value: number, name: string) => [value, name]}
-                />
-              </PieChart>
-            </ResponsiveContainer>
-            <div className="mt-4 grid gap-3">
-              {deliveryBreakdown.map((entry) => (
-                <div key={entry.name} className="flex items-center justify-between rounded-2xl bg-slate-50 px-4 py-3">
-                  <div className="flex items-center gap-3">
-                    <span className="h-3 w-3 rounded-full" style={{ backgroundColor: entry.color }} />
-                    <span className="text-sm font-medium text-slate-700">{entry.name}</span>
-                  </div>
-                  <span className="text-sm font-semibold text-slate-500">{entry.value}</span>
+        <section className="grid items-start gap-3 xl:grid-cols-[1.7fr_1fr]">
+          <div className="space-y-3">
+            <div className="card-soft rounded-[1.75rem] p-4 shadow-xl">
+              <div className="mb-4 flex items-center justify-between">
+                <div>
+                  <h2 className="text-lg font-bold text-slate-800">Revenue Overview</h2>
+                  <p className="mt-1 text-sm text-slate-500">Monthly studio revenue performance.</p>
                 </div>
-              ))}
-            </div>
-          </div>
-        </section>
-
-        <section className="grid gap-6 xl:grid-cols-[1.5fr_1fr]">
-          <div className="card-soft rounded-[1.75rem] p-6 shadow-xl">
-            <div className="mb-5 flex items-center justify-between gap-4">
-              <div>
-                <h2 className="text-lg font-bold text-slate-800">Recent Projects</h2>
-                <p className="mt-1 text-sm text-slate-500">Quickly jump into active client work.</p>
+                <Badge className="border-0 bg-emerald-100 text-emerald-700 hover:bg-emerald-100">
+                  +18.2%
+                </Badge>
               </div>
-              <div className="rounded-full bg-slate-100 px-4 py-2 text-sm font-medium text-slate-600">
-                {recentProjects.length} active cards
+              <ResponsiveContainer width="100%" height={260}>
+                <BarChart data={revenueData} barCategoryGap={18}>
+                  <XAxis dataKey="month" axisLine={false} tickLine={false} tick={{ fontSize: 12, fill: "#64748b" }} />
+                  <YAxis axisLine={false} tickLine={false} tick={{ fontSize: 12, fill: "#64748b" }} tickFormatter={(value) => `Rs.${value / 1000}k`} />
+                  <Tooltip
+                    cursor={{ fill: "rgba(99, 102, 241, 0.06)" }}
+                    contentStyle={{
+                      borderRadius: "18px",
+                      border: "1px solid rgba(226, 232, 240, 1)",
+                      boxShadow: "0 20px 45px -20px rgba(15, 23, 42, 0.25)",
+                    }}
+                    formatter={(value: number) => [`Rs.${value.toLocaleString()}`, "Revenue"]}
+                  />
+                  <Bar dataKey="revenue" radius={[12, 12, 0, 0]} fill="url(#revenueGradient)" />
+                  <defs>
+                    <linearGradient id="revenueGradient" x1="0" x2="0" y1="0" y2="1">
+                      <stop offset="0%" stopColor="#7c3aed" />
+                      <stop offset="100%" stopColor="#38bdf8" />
+                    </linearGradient>
+                  </defs>
+                </BarChart>
+              </ResponsiveContainer>
+            </div>
+
+            <div className="card-soft rounded-[1.75rem] p-4 shadow-xl">
+              <div className="mb-4 flex items-center justify-between gap-4">
+                <div>
+                  <h2 className="text-lg font-bold text-slate-800">Recent Projects</h2>
+                  <p className="mt-1 text-sm text-slate-500">Quickly jump into active client work.</p>
+                </div>
+                <div className="rounded-full bg-slate-100 px-4 py-2 text-sm font-medium text-slate-600">
+                  {recentProjects.length} active cards
+                </div>
+              </div>
+
+              <div className="grid gap-3 md:grid-cols-2">
+                {recentProjects.map((project) => (
+                  <ProjectCard
+                    key={project.id}
+                    project={project}
+                    onQuickUpdate={() => setSelectedProject(project)}
+                    onOpenProject={() => navigate(`/projects/${project.id}`)}
+                  />
+                ))}
               </div>
             </div>
 
-            <div className="grid gap-4 md:grid-cols-2">
-              {recentProjects.map((project) => (
-                <ProjectCard
-                  key={project.id}
-                  project={project}
-                  onQuickUpdate={() => setSelectedProject(project)}
-                  onOpenProject={() => navigate(`/projects/${project.id}`)}
-                />
-              ))}
-            </div>
-          </div>
-
-          <div className="card-soft rounded-[1.75rem] p-6 shadow-xl">
-            <div className="mb-5 flex items-center justify-between">
-              <div>
-                <h2 className="text-lg font-bold text-slate-800">Pending Work</h2>
-                <p className="mt-1 text-sm text-slate-500">Priority queue for studio delivery.</p>
+            <div className="card-soft rounded-[1.75rem] p-4 shadow-xl">
+              <div className="mb-3 flex items-center justify-between">
+                <div>
+                  <h2 className="text-lg font-bold text-slate-800">Album Review Queue</h2>
+                  <p className="mt-1 text-sm text-slate-500">Client-selected images that are ready for admin review and editing.</p>
+                </div>
+                <div className="rounded-full bg-slate-100 px-4 py-2 text-sm font-medium text-slate-600">
+                  {albumReviewQueue.length} albums
+                </div>
               </div>
-              <CircleDashed className="h-5 w-5 text-slate-400" />
-            </div>
-            <div className="space-y-4">
-              {pendingProjects.map((project) => (
-                <div key={project.id} className="rounded-[1.4rem] border border-slate-200/80 bg-white/80 p-4 shadow-sm">
-                  <div className="flex h-full flex-col justify-between gap-6">
-                    <div>
-                      <p className="text-sm font-semibold text-slate-800">{project.clientName}</p>
-                      <p className="mt-1 text-sm text-slate-500">{project.projectName}</p>
+
+              <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-3">
+                {albumReviewQueue.length ? albumReviewQueue.map((album) => (
+                  <div key={album.recordId || album.albumId} className="rounded-[1.4rem] border border-slate-200/80 bg-white/85 p-5 shadow-sm">
+                    <div className="flex items-start justify-between gap-3">
+                      <div>
+                        <p className="text-base font-bold text-slate-800">{album.title}</p>
+                        <p className="mt-1 text-sm text-slate-500">{album.clientName}</p>
+                      </div>
+                      <Badge variant="outline" className="border-cyan-200 bg-cyan-50 text-cyan-700">
+                        {album.status}
+                      </Badge>
                     </div>
-                    <Badge variant="outline" className={priorityUi[project.priority]}>
-                      {project.priority}
-                    </Badge>
-                  </div>
-                  <div className="mt-4 space-y-2">
-                    <div className="flex items-center justify-between text-xs font-medium text-slate-500">
-                      <span>{statusUi[project.status].label}</span>
-                      <span>{project.completion}%</span>
+                    <div className="mt-4 grid grid-cols-3 gap-2.5 text-center">
+                      <AlbumMetric label="Album ID" value={album.albumId} />
+                      <AlbumMetric label="Passcode" value={album.passcode} />
+                      <AlbumMetric label="Picks" value={String(album.selectedPhotoIds.length)} />
                     </div>
-                    <Progress value={project.completion} className="h-2 bg-slate-200" />
+                    <div className="mt-4 text-sm text-slate-500">
+                      {album.selectedPhotoIds.length
+                        ? `${album.selectedPhotoIds.length} images selected by client. Open Gallery to review and start editing.`
+                        : "Waiting for client selections."}
+                    </div>
+                    <div className="mt-4">
+                      <Button variant="outline" onClick={() => navigate("/gallery")} className="w-full">
+                        Open Gallery Review
+                      </Button>
+                    </div>
                   </div>
-                  <div className="mt-4 flex items-center justify-between text-xs text-slate-500">
-                    <span>Due {project.dueDate}</span>
-                    <button
-                      onClick={() => setSelectedProject(project)}
-                      className="font-semibold text-violet-600 transition-colors hover:text-violet-500"
-                    >
-                      Quick Update
-                    </button>
+                )) : (
+                  <div className="rounded-[1.4rem] border border-dashed border-slate-300 bg-slate-50 p-6 text-sm text-slate-500">
+                    No album selections yet. Once a client opens an album and picks photos, they will appear here automatically.
                   </div>
-                </div>
-              ))}
-            </div>
-          </div>
-        </section>
-
-        <section className="card-soft rounded-[1.75rem] p-6 shadow-xl">
-          <div className="mb-5 flex items-center justify-between">
-            <div>
-              <h2 className="text-lg font-bold text-slate-800">Album Review Queue</h2>
-              <p className="mt-1 text-sm text-slate-500">Client-selected images that are ready for admin review and editing.</p>
-            </div>
-            <div className="rounded-full bg-slate-100 px-4 py-2 text-sm font-medium text-slate-600">
-              {albumReviewQueue.length} albums
+                )}
+              </div>
             </div>
           </div>
 
-          <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
-            {albumReviewQueue.length ? albumReviewQueue.map((album) => (
-              <div key={album.recordId || album.albumId} className="rounded-[1.4rem] border border-slate-200/80 bg-white/85 p-5 shadow-sm">
-                <div className="flex items-start justify-between gap-3">
-                  <div>
-                    <p className="text-base font-bold text-slate-800">{album.title}</p>
-                    <p className="mt-1 text-sm text-slate-500">{album.clientName}</p>
+          <div className="space-y-3">
+            <div className="card-soft rounded-[1.75rem] p-4 shadow-xl">
+              <div className="mb-4">
+                <h2 className="text-lg font-bold text-slate-800">Delivery Pipeline</h2>
+                <p className="mt-1 text-sm text-slate-500">Current project status distribution.</p>
+              </div>
+              <ResponsiveContainer width="100%" height={260}>
+                <PieChart>
+                  <Pie data={deliveryBreakdown} dataKey="value" nameKey="name" innerRadius={70} outerRadius={96} stroke="none" paddingAngle={4}>
+                    {deliveryBreakdown.map((entry) => (
+                      <Cell key={entry.name} fill={entry.color} />
+                    ))}
+                  </Pie>
+                  <Tooltip
+                    contentStyle={{
+                      borderRadius: "18px",
+                      border: "1px solid rgba(226, 232, 240, 1)",
+                      boxShadow: "0 20px 45px -20px rgba(15, 23, 42, 0.25)",
+                    }}
+                    formatter={(value: number, name: string) => [value, name]}
+                  />
+                </PieChart>
+              </ResponsiveContainer>
+              <div className="mt-4 grid gap-2.5">
+                {deliveryBreakdown.map((entry) => (
+                  <div key={entry.name} className="flex items-center justify-between rounded-2xl bg-slate-50 px-4 py-3">
+                    <div className="flex items-center gap-3">
+                      <span className="h-3 w-3 rounded-full" style={{ backgroundColor: entry.color }} />
+                      <span className="text-sm font-medium text-slate-700">{entry.name}</span>
+                    </div>
+                    <span className="text-sm font-semibold text-slate-500">{entry.value}</span>
                   </div>
-                  <Badge variant="outline" className="border-cyan-200 bg-cyan-50 text-cyan-700">
-                    {album.status}
-                  </Badge>
-                </div>
-                <div className="mt-4 grid grid-cols-3 gap-3 text-center">
-                  <AlbumMetric label="Album ID" value={album.albumId} />
-                  <AlbumMetric label="Passcode" value={album.passcode} />
-                  <AlbumMetric label="Picks" value={String(album.selectedPhotoIds.length)} />
-                </div>
-                <div className="mt-4 text-sm text-slate-500">
-                  {album.selectedPhotoIds.length
-                    ? `${album.selectedPhotoIds.length} images selected by client. Open Gallery to review and start editing.`
-                    : "Waiting for client selections."}
-                </div>
-                <div className="mt-4">
-                  <Button variant="outline" onClick={() => navigate("/gallery")} className="w-full">
-                    Open Gallery Review
-                  </Button>
-                </div>
+                ))}
               </div>
-            )) : (
-              <div className="rounded-[1.4rem] border border-dashed border-slate-300 bg-slate-50 p-6 text-sm text-slate-500">
-                No album selections yet. Once a client opens an album and picks photos, they will appear here automatically.
+            </div>
+
+            <div className="card-soft rounded-[1.75rem] p-4 shadow-xl">
+              <div className="mb-4 flex items-center justify-between">
+                <div>
+                  <h2 className="text-lg font-bold text-slate-800">Pending Work</h2>
+                  <p className="mt-1 text-sm text-slate-500">Priority queue for studio delivery.</p>
+                </div>
+                <CircleDashed className="h-5 w-5 text-slate-400" />
               </div>
-            )}
+              <div className="space-y-3">
+                {pendingProjects.map((project) => (
+                  <div key={project.id} className="rounded-[1.4rem] border border-slate-200/80 bg-white/80 p-4 shadow-sm">
+                    <div className="flex h-full flex-col justify-between gap-4">
+                      <div>
+                        <p className="text-sm font-semibold text-slate-800">{project.clientName}</p>
+                        <p className="mt-1 text-sm text-slate-500">{project.projectName}</p>
+                      </div>
+                      <Badge variant="outline" className={priorityUi[project.priority]}>
+                        {project.priority}
+                      </Badge>
+                    </div>
+                    <div className="mt-4 space-y-2">
+                      <div className="flex items-center justify-between text-xs font-medium text-slate-500">
+                        <span>{statusUi[project.status].label}</span>
+                        <span>{project.completion}%</span>
+                      </div>
+                      <Progress value={project.completion} className="h-2 bg-slate-200" />
+                    </div>
+                    <div className="mt-4 flex items-center justify-between text-xs text-slate-500">
+                      <span>Due {project.dueDate}</span>
+                      <button
+                        onClick={() => setSelectedProject(project)}
+                        className="font-semibold text-violet-600 transition-colors hover:text-violet-500"
+                      >
+                        Quick Update
+                      </button>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
           </div>
         </section>
       </div>
@@ -438,9 +440,13 @@ export default function Dashboard() {
 
 function AlbumMetric({ label, value }: { label: string; value: string }) {
   return (
-    <div className="rounded-xl bg-slate-50 px-3 py-3">
-      <p className="text-[10px] font-semibold uppercase tracking-wide text-slate-500">{label}</p>
-      <p className="mt-1 text-sm font-semibold text-slate-800">{value}</p>
+    <div className="flex min-h-[112px] min-w-0 flex-col items-center justify-start rounded-xl border border-slate-200/70 bg-slate-50 px-2.5 py-3 text-center">
+      <p className="text-[9px] font-semibold uppercase leading-4 tracking-[0.12em] text-slate-500">
+        {label}
+      </p>
+      <p className="mt-2 max-w-full break-words text-sm font-bold leading-6 text-slate-800">
+        {value}
+      </p>
     </div>
   );
 }

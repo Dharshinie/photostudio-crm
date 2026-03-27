@@ -37,6 +37,51 @@ export default function ProjectDetails() {
     [project],
   );
 
+  const handleExportSummary = () => {
+    if (!project) {
+      return;
+    }
+
+    const summaryContent = [
+      `Project Summary`,
+      `Generated: ${new Date().toLocaleString()}`,
+      ``,
+      `Project Name: ${project.projectName}`,
+      `Client: ${project.clientName}`,
+      `Project Type: ${project.projectType}`,
+      `Status: ${statusUi[project.status].label}`,
+      `Priority: ${project.priority}`,
+      `Due Date: ${project.dueDate}`,
+      `Completion: ${project.completion}%`,
+      `Deliverables: ${project.deliverables}`,
+      ``,
+      `Current Update`,
+      `${currentStep?.label ?? "No current step available"}`,
+      `${currentStep?.description ?? "No description available"}`,
+      `Timestamp: ${currentStep?.time ?? "Not available"}`,
+      ``,
+      `Internal Notes`,
+      `${project.notes || "No internal notes available."}`,
+      ``,
+      `Timeline`,
+      ...project.timeline.map(
+        (step) => `- ${step.label} | ${step.status.toUpperCase()} | ${step.time} | ${step.description}`,
+      ),
+    ].join("\n");
+
+    const blob = new Blob([summaryContent], { type: "text/plain;charset=utf-8" });
+    const downloadUrl = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    const safeName = project.projectName.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-+|-+$/g, "");
+
+    link.href = downloadUrl;
+    link.download = `${safeName || "project"}-summary.txt`;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(downloadUrl);
+  };
+
   if (!project) {
     return (
       <div className="mx-auto flex min-h-[60vh] max-w-3xl flex-col items-center justify-center text-center">
@@ -134,7 +179,7 @@ export default function ProjectDetails() {
             <h2 className="text-lg font-bold text-slate-800">Internal Notes</h2>
             <p className="mt-4 text-sm leading-7 text-slate-500">{project.notes}</p>
             <div className="mt-6 flex flex-wrap gap-3">
-              <Button className="rounded-full bg-slate-900 text-white hover:bg-slate-800">
+              <Button onClick={handleExportSummary} className="rounded-full bg-slate-900 text-white hover:bg-slate-800">
                 <Download className="mr-2 h-4 w-4" />
                 Export Summary
               </Button>

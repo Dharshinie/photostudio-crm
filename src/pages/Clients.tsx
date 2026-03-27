@@ -57,9 +57,12 @@ export default function Clients() {
                   <p className="text-xs text-muted-foreground flex items-center gap-1.5 truncate">
                     <Mail className="h-3 w-3 shrink-0" /> {c.email}
                   </p>
-                  <p className="text-xs text-muted-foreground flex items-center gap-1.5">
+                  <a
+                    href={`tel:${c.phone.replace(/[^\d+]/g, "")}`}
+                    className="flex items-center gap-1.5 text-xs text-muted-foreground transition-colors hover:text-foreground"
+                  >
                     <Phone className="h-3 w-3 shrink-0" /> {c.phone}
-                  </p>
+                  </a>
                 </div>
               </div>
             </div>

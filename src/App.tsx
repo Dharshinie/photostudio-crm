@@ -12,6 +12,7 @@ import Clients from "./pages/Clients";
 import Gallery from "./pages/Gallery";
 import Notifications from "./pages/Notifications";
 import Settings from "./pages/Settings";
+import Storage from "./pages/Storage";
 import NotFound from "./pages/NotFound";
 import Signup from "./pages/Signup";
 import Login from "./pages/Login";
@@ -79,6 +80,14 @@ const App = () => (
                   </ProtectedRoute>
                 }
                 path="/notifications"
+              />
+              <Route
+                element={
+                  <ProtectedRoute allowedRoles={["admin"]}>
+                    <AppLayout><Storage /></AppLayout>
+                  </ProtectedRoute>
+                }
+                path="/storage"
               />
               <Route
                 element={

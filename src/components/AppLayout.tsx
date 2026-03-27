@@ -72,8 +72,8 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
                 </Button>
 
                 {showNotifications && (
-                  <div className="absolute right-0 top-12 z-[110] w-80 rounded-2xl border border-white/40 p-1 shadow-lg glass animate-fade-in-up">
-                    <div className="px-3 py-2.5 flex items-center justify-between border-b border-border/30">
+                  <div className="absolute right-0 top-12 z-[110] w-80 rounded-2xl border border-slate-200 bg-white p-1 shadow-lg animate-fade-in-up">
+                    <div className="flex items-center justify-between border-b border-slate-200 px-3 py-2.5">
                       <p className="text-sm font-semibold text-foreground">Notifications</p>
                       <span className="text-[10px] font-semibold text-primary bg-primary/10 px-2 py-0.5 rounded-full">
                         {unreadCount} new
@@ -83,7 +83,7 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
                       {quickNotifications.map((n) => (
                         <button
                           key={n.id}
-                          className="w-full text-left px-3 py-2.5 rounded-xl hover:bg-accent/60 transition-colors flex items-start gap-2.5"
+                          className="flex w-full items-start gap-2.5 rounded-xl px-3 py-2.5 text-left transition-colors hover:bg-slate-100"
                         >
                           {n.unread && <span className="h-2 w-2 rounded-full bg-primary shrink-0 mt-1.5" />}
                           {!n.unread && <span className="h-2 w-2 shrink-0 mt-1.5" />}
@@ -96,7 +96,7 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
                         </button>
                       ))}
                     </div>
-                    <div className="border-t border-border/30 px-3 py-2">
+                    <div className="border-t border-slate-200 px-3 py-2">
                       <button
                         onClick={() => { navigate("/notifications"); setShowNotifications(false); }}
                         className="w-full text-center text-xs font-medium text-primary hover:underline"
@@ -125,7 +125,7 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
                 </button>
 
                 {showProfile && (
-                  <div className="absolute right-0 top-14 z-[120] w-72 rounded-2xl bg-white p-2 animate-fade-in-up">
+                  <div className="absolute right-0 top-14 z-[120] w-72 rounded-2xl border border-slate-200 bg-white p-2 shadow-lg animate-fade-in-up">
                     <div className="px-4 py-4 border-b border-slate-200/80">
                       <div className="flex items-center gap-3">
                         <div className="h-12 w-12 rounded-full bg-gradient-to-br from-primary to-primary/60 flex items-center justify-center text-lg font-bold text-white shadow-md">
