@@ -259,7 +259,7 @@ export default function Dashboard() {
                 </div>
               </div>
 
-              <div className="grid gap-4 md:grid-cols-2 2xl:grid-cols-3">
+              <div className="grid gap-4 md:grid-cols-2 2xl:grid-cols-2">
                 {albumReviewQueue.length ? albumReviewQueue.map((album) => (
                   <div key={album.recordId || album.albumId} className="flex h-full flex-col rounded-[1.4rem] border border-slate-200/80 bg-white/85 p-4 shadow-sm sm:p-5 lg:p-6">
                     <div className="flex flex-wrap items-start justify-between gap-3">
@@ -271,7 +271,7 @@ export default function Dashboard() {
                         {album.status}
                       </Badge>
                     </div>
-                    <div className="mt-5 grid grid-cols-3 gap-2 xl:grid-cols-3 2xl:grid-cols-2">
+                    <div className="mt-5 grid grid-cols-3 gap-2 xl:grid-cols-3 2xl:grid-cols-3">
                       <AlbumMetric label="Album ID" value={album.albumId} />
                       <AlbumMetric label="Passcode" value={album.passcode} />
                       <AlbumMetric label="Picks" value={String(album.selectedPhotoIds.length)} />
