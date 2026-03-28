@@ -1,0 +1,181 @@
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --background: 205 45% 97%;
+    --foreground: 247 24% 18%;
+
+    --card: 0 0% 100% / 0.82;
+    --card-foreground: 247 24% 18%;
+
+    --popover: 0 0% 100% / 0.96;
+    --popover-foreground: 247 24% 18%;
+
+    --primary: 252 42% 52%;
+    --primary-foreground: 0 0% 100%;
+
+    --secondary: 196 42% 90%;
+    --secondary-foreground: 200 32% 26%;
+
+    --muted: 210 24% 93%;
+    --muted-foreground: 245 10% 42%;
+
+    --accent: 250 55% 95%;
+    --accent-foreground: 252 42% 42%;
+
+    --destructive: 0 55% 58%;
+    --destructive-foreground: 0 0% 100%;
+
+    --border: 214 28% 84%;
+    --input: 214 28% 84%;
+    --ring: 252 42% 52%;
+
+    --radius: 0.875rem;
+
+    /* CRM semantic tokens — soft elegance */
+    --lavender: 252 42% 52%;
+    --lavender-light: 252 80% 95%;
+    --mint: 163 33% 48%;
+    --mint-light: 160 42% 92%;
+    --peach: 22 74% 66%;
+    --peach-light: 24 80% 93%;
+    --sky: 203 60% 58%;
+    --sky-light: 200 75% 93%;
+
+    --sidebar-background: 0 0% 100% / 0.68;
+    --sidebar-foreground: 245 14% 32%;
+    --sidebar-primary: 252 42% 52%;
+    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-accent: 250 55% 95%;
+    --sidebar-accent-foreground: 252 42% 42%;
+    --sidebar-border: 214 28% 88%;
+    --sidebar-ring: 252 42% 52%;
+
+    /* Glassmorphism tokens */
+    --glass-bg: 0 0% 100% / 0.78;
+    --glass-border: 0 0% 100% / 0.7;
+    --glass-blur: 22px;
+    --glass-shadow: 0 24px 60px -28px hsl(240 32% 30% / 0.28), 0 8px 24px hsl(210 42% 38% / 0.08);
+    --glass-shadow-hover: 0 28px 80px -28px hsl(240 32% 30% / 0.34), 0 12px 28px hsl(210 42% 38% / 0.12);
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+  body {
+    @apply bg-background text-foreground antialiased;
+    font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
+    background-image:
+      radial-gradient(circle at top left, hsl(252 80% 92% / 0.9), transparent 36%),
+      radial-gradient(circle at top right, hsl(196 80% 90% / 0.85), transparent 34%),
+      radial-gradient(circle at bottom center, hsl(160 48% 90% / 0.75), transparent 38%),
+      linear-gradient(180deg, hsl(220 45% 98%), hsl(200 40% 95%));
+    background-attachment: fixed;
+  }
+}
+
+@layer utilities {
+  .glass {
+    background: hsl(var(--glass-bg));
+    backdrop-filter: blur(var(--glass-blur));
+    -webkit-backdrop-filter: blur(var(--glass-blur));
+    border: 1px solid hsl(var(--glass-border));
+    box-shadow: var(--glass-shadow);
+  }
+  .glass:hover {
+    box-shadow: var(--glass-shadow-hover);
+  }
+
+  .card-soft {
+    @apply rounded-xl;
+    background: hsl(var(--glass-bg));
+    backdrop-filter: blur(var(--glass-blur));
+    -webkit-backdrop-filter: blur(var(--glass-blur));
+    border: 1px solid hsl(var(--glass-border));
+    box-shadow: var(--glass-shadow);
+    transition: box-shadow 0.3s ease-out, transform 0.3s ease-out;
+  }
+  .card-soft:hover {
+    box-shadow: var(--glass-shadow-hover);
+  }
+
+  .stat-lavender {
+    background: linear-gradient(135deg, hsl(270 40% 62% / 0.08), hsl(270 35% 95% / 0.7));
+    backdrop-filter: blur(var(--glass-blur));
+    -webkit-backdrop-filter: blur(var(--glass-blur));
+  }
+  .stat-mint {
+    background: linear-gradient(135deg, hsl(158 38% 52% / 0.08), hsl(158 30% 93% / 0.7));
+    backdrop-filter: blur(var(--glass-blur));
+    -webkit-backdrop-filter: blur(var(--glass-blur));
+  }
+  .stat-peach {
+    background: linear-gradient(135deg, hsl(22 70% 68% / 0.08), hsl(22 55% 94% / 0.7));
+    backdrop-filter: blur(var(--glass-blur));
+    -webkit-backdrop-filter: blur(var(--glass-blur));
+  }
+  .stat-sky {
+    background: linear-gradient(135deg, hsl(215 55% 62% / 0.08), hsl(215 45% 94% / 0.7));
+    backdrop-filter: blur(var(--glass-blur));
+    -webkit-backdrop-filter: blur(var(--glass-blur));
+  }
+
+  .auth-scene {
+    position: relative;
+    overflow: hidden;
+    background:
+      radial-gradient(circle at 15% 20%, rgba(255, 255, 255, 0.28) 0 1px, transparent 1.5px),
+      radial-gradient(circle at 30% 35%, rgba(255, 255, 255, 0.32) 0 1.2px, transparent 1.7px),
+      radial-gradient(circle at 48% 18%, rgba(255, 255, 255, 0.26) 0 1px, transparent 1.4px),
+      radial-gradient(circle at 63% 28%, rgba(255, 255, 255, 0.3) 0 1.2px, transparent 1.7px),
+      radial-gradient(circle at 78% 16%, rgba(255, 255, 255, 0.28) 0 1px, transparent 1.5px),
+      radial-gradient(circle at 88% 34%, rgba(255, 255, 255, 0.22) 0 1px, transparent 1.4px),
+      radial-gradient(circle at top, rgba(214, 168, 255, 0.28), transparent 36%),
+      linear-gradient(180deg, #6d23d7 0%, #5a1ec0 32%, #43108e 62%, #2a0757 100%);
+    background-size:
+      180px 180px,
+      220px 220px,
+      200px 200px,
+      240px 240px,
+      210px 210px,
+      230px 230px,
+      auto,
+      auto;
+  }
+
+  .auth-scene::before {
+    content: "";
+    position: absolute;
+    inset: auto 0 0 0;
+    height: 46%;
+    background: linear-gradient(180deg, transparent, rgba(25, 5, 54, 0.16));
+    clip-path: polygon(0 58%, 11% 44%, 20% 54%, 34% 32%, 47% 49%, 58% 29%, 70% 46%, 82% 27%, 100% 55%, 100% 100%, 0 100%);
+    background-color: rgba(129, 87, 222, 0.5);
+    opacity: 0.95;
+  }
+
+  .auth-scene::after {
+    content: "";
+    position: absolute;
+    inset: auto 0 0 0;
+    height: 34%;
+    background:
+      radial-gradient(circle at 6% 100%, rgba(41, 8, 90, 0.96) 0 55px, transparent 56px),
+      radial-gradient(circle at 14% 100%, rgba(41, 8, 90, 0.96) 0 78px, transparent 79px),
+      radial-gradient(circle at 23% 100%, rgba(41, 8, 90, 0.98) 0 60px, transparent 61px),
+      radial-gradient(circle at 34% 100%, rgba(41, 8, 90, 0.98) 0 88px, transparent 89px),
+      radial-gradient(circle at 46% 100%, rgba(41, 8, 90, 0.98) 0 66px, transparent 67px),
+      radial-gradient(circle at 58% 100%, rgba(41, 8, 90, 0.98) 0 92px, transparent 93px),
+      radial-gradient(circle at 70% 100%, rgba(41, 8, 90, 0.98) 0 64px, transparent 65px),
+      radial-gradient(circle at 82% 100%, rgba(41, 8, 90, 0.98) 0 84px, transparent 85px),
+      radial-gradient(circle at 94% 100%, rgba(41, 8, 90, 0.98) 0 58px, transparent 59px),
+      linear-gradient(180deg, rgba(69, 18, 140, 0.28), rgba(34, 4, 76, 0.98));
+    pointer-events: none;
+  }
+}
