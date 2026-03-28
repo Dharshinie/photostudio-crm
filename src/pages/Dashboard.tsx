@@ -259,29 +259,29 @@ export default function Dashboard() {
                 </div>
               </div>
 
-              <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-3">
+              <div className="grid gap-4 md:grid-cols-2 2xl:grid-cols-3">
                 {albumReviewQueue.length ? albumReviewQueue.map((album) => (
-                  <div key={album.recordId || album.albumId} className="rounded-[1.4rem] border border-slate-200/80 bg-white/85 p-5 shadow-sm">
-                    <div className="flex items-start justify-between gap-3">
+                  <div key={album.recordId || album.albumId} className="flex h-full flex-col rounded-[1.4rem] border border-slate-200/80 bg-white/85 p-4 shadow-sm sm:p-5 lg:p-6">
+                    <div className="flex flex-wrap items-start justify-between gap-3">
                       <div>
                         <p className="text-base font-bold text-slate-800">{album.title}</p>
                         <p className="mt-1 text-sm text-slate-500">{album.clientName}</p>
                       </div>
-                      <Badge variant="outline" className="border-cyan-200 bg-cyan-50 text-cyan-700">
+                      <Badge variant="outline" className="shrink-0 border-cyan-200 bg-cyan-50 text-cyan-700">
                         {album.status}
                       </Badge>
                     </div>
-                    <div className="mt-4 grid grid-cols-3 gap-2.5 text-center">
+                    <div className="mt-5 grid grid-cols-3 gap-2 xl:grid-cols-3 2xl:grid-cols-2">
                       <AlbumMetric label="Album ID" value={album.albumId} />
                       <AlbumMetric label="Passcode" value={album.passcode} />
                       <AlbumMetric label="Picks" value={String(album.selectedPhotoIds.length)} />
                     </div>
-                    <div className="mt-4 text-sm text-slate-500">
+                    <div className="mt-4 px-1 text-sm leading-6 text-slate-500">
                       {album.selectedPhotoIds.length
                         ? `${album.selectedPhotoIds.length} images selected by client. Open Gallery to review and start editing.`
                         : "Waiting for client selections."}
                     </div>
-                    <div className="mt-4">
+                    <div className="mt-auto pt-4">
                       <Button variant="outline" onClick={() => navigate("/gallery")} className="w-full">
                         Open Gallery Review
                       </Button>
@@ -440,13 +440,15 @@ export default function Dashboard() {
 
 function AlbumMetric({ label, value }: { label: string; value: string }) {
   return (
-    <div className="flex min-h-[112px] min-w-0 flex-col items-center justify-start rounded-xl border border-slate-200/70 bg-slate-50 px-2.5 py-3 text-center">
-      <p className="text-[9px] font-semibold uppercase leading-4 tracking-[0.12em] text-slate-500">
+    <div className="flex min-h-[108px] min-w-0 flex-col rounded-[1rem] border border-slate-200/70 bg-slate-50 px-3 py-3 text-center sm:min-h-[116px] sm:px-4">
+      <p className="text-[10px] font-semibold uppercase leading-4 tracking-[0.16em] text-slate-500">
         {label}
       </p>
-      <p className="mt-2 max-w-full break-words text-sm font-bold leading-6 text-slate-800">
+      <div className="mt-3 flex min-h-0 flex-1 items-center justify-center">
+        <p className="max-w-full break-words text-[1.05rem] font-bold leading-8 tracking-tight text-slate-800">
         {value}
-      </p>
+        </p>
+      </div>
     </div>
   );
 }
